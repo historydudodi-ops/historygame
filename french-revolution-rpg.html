@@ -122,6 +122,8 @@ button.cd:hover{background:rgba(255,250,232,.9);box-shadow:0 0 0 2px var(--gold)
 .iplace{font-size:17px;color:#6b5434}
 .itext{font-size:21px;line-height:1.75;text-align:left;margin:18px 0}
 .imission{background:rgba(123,90,44,.14);border-left:4px solid var(--red);text-align:left;padding:10px 14px;font-size:18px;line-height:1.6;margin-bottom:20px}
+#title .credit{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-family:var(--display);font-size:17px;letter-spacing:.32em;color:rgba(242,214,140,.82);text-shadow:0 2px 6px rgba(0,0,0,.7)}
+#title .credit::before,#title .credit::after{content:'';display:inline-block;width:46px;height:1px;background:rgba(242,214,140,.55);vertical-align:middle;margin:0 16px}
 #title{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 45%,rgba(20,12,4,.35),rgba(10,6,2,.85))}
 .tbox{width:860px;text-align:center}
 .tsub{font-size:20px;color:#e2cb94;letter-spacing:.04em}
@@ -141,6 +143,7 @@ button.cd:hover{background:rgba(255,250,232,.9);box-shadow:0 0 0 2px var(--gold)
 #toast{position:absolute;left:50%;top:150px;transform:translateX(-50%);background:rgba(20,12,6,.92);border:2px solid var(--red);color:#fbe9c4;padding:10px 20px;border-radius:8px;font-size:19px;max-width:820px;text-align:center;pointer-events:none;transition:opacity .3s}
 #fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .45s}
 #fade.on{opacity:1}
+#homeAsk .parch{width:560px;padding:28px 36px;text-align:center}#homeAsk .tbtns{justify-content:center}
 #tmenu .parch{width:640px;padding:28px 36px;text-align:center}.tmh{font-family:var(--display);color:var(--red);margin:0 0 6px}.tmp{font-size:16px;line-height:1.6;margin:0 0 16px}.tmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.tmgrid .pbtn{font-size:15px;padding:10px 6px}
 /* wake-up (dream ending) */
 #cv.dreaming{animation:dreamwarp 1.7s ease-in forwards}
@@ -181,7 +184,7 @@ button.cd:hover{background:rgba(255,250,232,.9);box-shadow:0 0 0 2px var(--gold)
         <span class="stat" id="hScore">⭐ 0</span>
         <button class="hbtn" id="bCards">🃏 <span id="hCards">0/9</span> 역사 카드<kbd>C</kbd></button>
         <span class="stat" id="hTime">⏱ 00:00</span>
-        <button class="hbtn hidden" id="bAuto" title="교사 모드: 이 단계 자동 완료">⏭ 자동 완료</button><button class="hbtn" id="bSheet">📜 학습지<kbd>Tab</kbd></button>
+        <button class="hbtn" id="bHome" title="첫 화면으로">🏠 첫 화면</button><button class="hbtn hidden" id="bAuto" title="교사 모드: 이 단계 자동 완료">⏭ 자동 완료</button><button class="hbtn" id="bSheet">📜 학습지<kbd>Tab</kbd></button>
         <button class="hbtn" id="bSound" aria-label="소리 켜기/끄기">🔊</button>
         <button class="hbtn" id="bFull" aria-label="전체 화면">⛶</button>
       </div>
@@ -236,13 +239,14 @@ button.cd:hover{background:rgba(255,250,232,.9);box-shadow:0 0 0 2px var(--gold)
   </div></div>
 
   <div id="title">
+    <div class="credit">MADE BY 햄쥐</div>
     <div class="tbox">
       <div class="tsub">프랑스 혁명 시간여행 RPG</div>
       <div class="tmain">1789<em>혁명 속으로</em></div>
       <div class="tstory">역사 시간에 깜빡 졸았는데, 눈을 떠 보니 1789년 프랑스.<br>손에 쥔 건 빈칸투성이 학습지 한 장뿐이다.<br>혁명의 현장을 돌아다니며 사람들을 만나 학습지를 완성해야 돌아올 수 있다!</div>
       <div class="tform"><input id="inCls" maxlength="6" inputmode="numeric" placeholder="반·번호 (예: 2310)"><input id="inName" maxlength="12" placeholder="이름"></div>
       <div class="tbtns"><button class="pbtn red" id="bStart">시간여행 시작</button><button class="pbtn hidden" id="bResume">이어서 하기</button></div>
-      <div class="tkeys"><span>←↑↓→ 이동</span><span>Space / Enter 대화</span><span>Tab 학습지</span></div>
+      <div class="tkeys"><span>←↑↓→ 이동</span><span>Space / Enter 대화</span><span>Tab 학습지</span><span>C 역사 카드</span></div>
     </div>
   </div>
 
@@ -251,6 +255,11 @@ button.cd:hover{background:rgba(255,250,232,.9);box-shadow:0 0 0 2px var(--gold)
     <p class="tmp">확인할 단계를 고르세요. 진행 기록은 저장되지 않아요.<br>게임 중 위쪽 <b>⏭ 자동 완료</b>를 누르면 그 단계의 빈칸·미션이 모두 채워져요.</p>
     <div class="tmgrid" id="tmGrid"></div>
     <button class="pbtn red" id="tmEnd">🎬 엔딩(꿈에서 깨기)만 바로 보기</button>
+  </div></div>
+  <div id="homeAsk" class="modalbg hidden"><div class="parch">
+    <h2 class="tmh">🏠 첫 화면으로 돌아갈까요?</h2>
+    <p class="tmp" id="homeMsg">지금까지의 진행 상황은 저장돼요.<br>첫 화면에서 <b>이어서 하기</b>를 누르면 이 단계부터 다시 할 수 있어요.</p>
+    <div class="tbtns"><button class="pbtn red" id="homeYes">첫 화면으로</button><button class="pbtn" id="homeNo">계속하기 (Esc)</button></div>
   </div></div>
   <div id="dreamGlow"></div>
   <div id="wake" class="hidden"><canvas id="wakeCv"></canvas><div class="lid" id="lidT"></div><div class="lid" id="lidB"></div><div id="wakeFlash"></div>
@@ -547,7 +556,7 @@ let S=null;
 function fresh(name,cls){return{name,cls,stage:0,maxStage:0,seen:{},score:0,answers:{},talked:{},cards:{},taken:{},elapsed:0,finished:false}}
 function save(){if(S&&S.teacher)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function load(){try{const v=localStorage.getItem(KEY);return v?JSON.parse(v):null}catch(e){return null}}
-let mode='title',stIdx=0,ST=null;
+let mode='title',stIdx=0,ST=null,startArmed=false;
 const player={x:70,y:650,face:1,walking:false,t:0,trail:[],inv:0};
 const keys={};let floats=[],parts=[],smoke=[],toastT=0,lockT=0;
 
@@ -738,6 +747,7 @@ window.addEventListener('keydown',e=>{const tg=e.target;if(tg&&tg.tagName==='INP
  const act=e.key===' '||e.key==='Enter';
  if(mode==='wakeDone'&&act){e.preventDefault();wakeDone();return}
  if(mode==='wake')return;
+ if(mode==='homeAsk'){if(e.key==='Escape'){e.preventDefault();cancelHome()}return}
  if(e.key==='Tab'){e.preventDefault();if(mode==='sheet')closeSheet();else if(mode==='play')openSheet();return}
  if(['c','C','ㅊ'].includes(e.key)){if(mode==='cards'){closeCards();return}if(mode==='play'){openCards();return}}
  if(mode==='cards'&&e.key==='Escape'){closeCards();return}
@@ -763,9 +773,14 @@ window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'){show('pad'
 document.querySelectorAll('#pad button').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;b.setPointerCapture(e.pointerId)});for(const ev of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>keys[k]=false)});
 $('padA').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='play'){const n=nearNPC();if(n)openDialog(n)}else if(mode==='dialog')advanceDialog();else if(mode==='intro')startPlay();else if(mode==='card')closeCard()});
 // title
-const saved=load();
-if(saved&&!saved.finished&&saved.name!==undefined){$('bResume').classList.remove('hidden');$('bResume').textContent=`이어서 하기 (${saved.name||'이름 없음'} · ${saved.stage+1}단계)`;$('inName').value=saved.name||'';$('inCls').value=saved.cls||''}
-let startArmed=false;
+let saved=load();
+function refreshTitle(){saved=load();if(saved&&!saved.finished&&saved.name!==undefined){$('bResume').classList.remove('hidden');$('bResume').textContent=`이어서 하기 (${saved.name||'이름 없음'} · ${saved.stage+1}단계)`;$('inName').value=saved.name||'';$('inCls').value=saved.cls||''}else{$('bResume').classList.add('hidden');$('inName').value='';$('inCls').value=''}startArmed=false;$('bStart').textContent='시간여행 시작'}
+refreshTitle();
+let homePrev='play';
+function askHome(){if(!ST||!['play','sheet','cards','intro'].includes(mode))return;homePrev=mode;$('homeMsg').innerHTML=S.teacher?'교사 확인 모드는 진행 기록이 저장되지 않아요.':'지금까지의 진행 상황은 저장돼요.<br>첫 화면에서 <b>이어서 하기</b>를 누르면 이 단계부터 다시 할 수 있어요.';show('homeAsk');mode='homeAsk';setTimeout(()=>$('homeNo').focus(),50)}
+function cancelHome(){hide('homeAsk');mode=homePrev}
+function goHome(){save();stopBgm();['homeAsk','intro','dlg','quiz','sheet','card','cards','tmenu','wake','end','hud','goal'].forEach(id=>{const e=$(id);if(e)e.classList.add('hidden')});$('bAuto').classList.add('hidden');cv.classList.remove('dreaming');$('dreamGlow').classList.remove('on');D=null;Q=null;ST=null;mode='title';refreshTitle();show('title');setTimeout(()=>$('inCls').focus(),50)}
+$('bHome').onclick=askHome;$('homeYes').onclick=goHome;$('homeNo').onclick=cancelHome;
 $('bStart').onclick=()=>{if($('inCls').value.trim()==='0000'){startTeacher();return}const nm=$('inName').value.trim();if(!nm){$('inName').focus();$('inName').placeholder='이름을 먼저 적어 주세요';return}if(saved&&!saved.finished&&!startArmed){startArmed=true;$('bStart').textContent='한 번 더 누르면 새로 시작 (기록 삭제)';setTimeout(()=>{startArmed=false;$('bStart').textContent='시간여행 시작'},4000);return}S=fresh(nm,$('inCls').value.trim());save();hide('title');enterStage(0);beep([[1,.01,0,'sine',.0001]])};
 $('bResume').onclick=()=>{S=saved;const nm=$('inName').value.trim();if(nm)S.name=nm;const c=$('inCls').value.trim();if(c)S.cls=c;hide('title');if(S.maxStage==null)S.maxStage=S.stage;enterStage(S.stage,{intro:true})};
 $('inCls').addEventListener('keyup',e=>{if(e.key==='Enter'&&!e.isComposing)$('inName').focus()});
