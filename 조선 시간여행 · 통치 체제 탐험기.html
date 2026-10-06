@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>조선 시간여행 · 통치 체제 탐험기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #1b2a1f; --paper: #f8eed2; --paper-ink: #2b1d10; --edge: #5b3a1e; --accent: #b3382c; --gold: #f1b72c;
+  --ok: #1e8a4c; --no: #c0392b; --panel: rgba(18, 24, 38, .82); --panel-ink: #f4f1e8; --soft: #7a6a55;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0e1712; --paper: #2a2318; --paper-ink: #f3e8c9; --edge: #a07a45; --soft: #b9a98a; }
+}
+:root[data-theme="dark"] { --bg: #0e1712; --paper: #2a2318; --paper-ink: #f3e8c9; --edge: #a07a45; --soft: #b9a98a; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: var(--panel-ink); -webkit-user-select: none; user-select: none; touch-action: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.hide { display: none !important; }
+#cv { position: fixed; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; background: var(--bg); }
+
+/* HUD */
+#hud { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 8px; right: 8px; display: flex; gap: 8px; align-items: flex-start; justify-content: space-between; pointer-events: none; z-index: 10; flex-wrap: wrap; }
+#hud > div { display: flex; gap: 6px; align-items: center; pointer-events: auto; flex-wrap: wrap; }
+.pill, .hbtn { background: var(--panel); border: 2px solid rgba(255,255,255,.18); border-radius: 22px; padding: 4px 12px; font-weight: 700; font-size: 15px; }
+.hbtn:hover { border-color: var(--gold); }
+.stam { background: var(--panel); border: 2px solid rgba(255,255,255,.18); border-radius: 14px; padding: 4px 10px; font-size: 13px; min-width: 190px; }
+.sbar { height: 8px; background: rgba(255,255,255,.18); border-radius: 5px; overflow: hidden; margin-top: 3px; }
+.sbar i { display: block; height: 100%; width: 100%; background: #53d27f; transition: background .2s; }
+.sbar i.low { background: #e5604f; }
+#zone { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 56px); left: 50%; transform: translateX(-50%); background: var(--panel); border: 2px solid var(--gold); border-radius: 12px; padding: 6px 18px; font-weight: 700; z-index: 11; opacity: 0; transition: opacity .4s; pointer-events: none; text-align: center; font-size: 17px; }
+#zone.show { opacity: 1; }
+#prompt { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%); background: var(--panel); border: 2px solid var(--gold); border-radius: 22px; padding: 8px 22px; font-weight: 700; z-index: 11; pointer-events: none; font-size: 18px; }
+#racehud { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 100px); left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; border-radius: 14px; padding: 6px 20px; font-size: 22px; font-weight: 900; z-index: 11; font-variant-numeric: tabular-nums; }
+#toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); transform: translateX(-50%); background: var(--panel); border: 2px solid var(--gold); border-radius: 12px; padding: 8px 20px; font-weight: 700; z-index: 40; opacity: 0; transition: opacity .3s; pointer-events: none; max-width: 90vw; text-align: center; }
+#toast.show { opacity: 1; }
+#keyhint { position: fixed; left: 8px; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); background: var(--panel); border-radius: 10px; padding: 4px 12px; font-size: 13px; z-index: 9; transition: opacity 1s; pointer-events: none; }
+
+/* touch pad */
+#pad { position: fixed; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); z-index: 12; display: flex; justify-content: space-between; padding: 0 16px; pointer-events: none; }
+#pad > * { pointer-events: auto; }
+.dp { display: grid; grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 58px); gap: 4px; }
+.dp button, .ab button { background: var(--panel); border: 2px solid rgba(255,255,255,.3); border-radius: 14px; font-size: 22px; font-weight: 900; touch-action: none; }
+.dp button:active, .ab button:active { background: var(--gold); color: #222; }
+.dp .w { grid-column: 2; grid-row: 1; } .dp .a { grid-column: 1; grid-row: 2; } .dp .s { grid-column: 2; grid-row: 3; } .dp .d { grid-column: 3; grid-row: 2; }
+.ab { display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
+.ab button { width: 96px; height: 56px; font-size: 17px; }
+
+/* dialog */
+#dlg { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 12px); display: flex; justify-content: center; }
+.dbox { position: relative; width: min(920px, 100%); background: var(--paper); color: var(--paper-ink); border: 4px solid var(--edge); border-radius: 16px; padding: 22px 22px 14px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.dname { position: absolute; top: -18px; left: 18px; background: var(--edge); color: #fff; font-weight: 900; padding: 3px 16px; border-radius: 10px; font-size: 17px; }
+.dtext { font-size: clamp(18px, 2.3vw, 26px); line-height: 1.6; min-height: 3.2em; word-break: keep-all; white-space: pre-wrap; font-weight: 500; }
+.dfb { color: var(--no); font-weight: 700; min-height: 1.4em; font-size: clamp(15px, 1.8vw, 20px); }
+.dopts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px; }
+.dopts:empty { display: none; }
+.dopts .opt { background: #fff8e3; color: var(--paper-ink); border: 3px solid var(--edge); border-radius: 12px; padding: 12px 14px; font-size: clamp(17px, 2.1vw, 24px); font-weight: 700; text-align: left; display: flex; gap: 10px; align-items: center; }
+.dopts .opt i { font-style: normal; background: var(--edge); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; flex: none; }
+.dopts .opt:hover:not(:disabled) { background: #ffe9a8; }
+.dopts .opt:disabled { opacity: .3; text-decoration: line-through; cursor: default; }
+.dfoot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; min-height: 40px; }
+.dfoot .muted { color: var(--soft); font-size: 14px; }
+.dfoot button, .mbtn, .cbtn { background: var(--edge); color: #fff; border: 0; border-radius: 12px; padding: 8px 20px; font-weight: 900; font-size: 17px; }
+.dfoot #useHint { background: #3b6fa8; }
+.dfoot button:hover, .mbtn:hover, .cbtn:hover { filter: brightness(1.15); }
+.shake { animation: shake .35s; }
+@keyframes shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+#stamp { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%) rotate(-12deg); border: 10px solid var(--accent); color: var(--accent); font-size: clamp(60px, 12vw, 140px); font-weight: 900; padding: 0 30px; border-radius: 18px; z-index: 50; pointer-events: none; opacity: 0; background: rgba(255,255,255,.25); }
+#stamp.go { animation: stamp 1.1s ease-out; }
+@keyframes stamp { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-12deg) scale(3); } 25% { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* overlays */
+.ov { position: fixed; inset: 0; background: rgba(8, 12, 22, .78); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 14px; overflow: auto; }
+.card { background: var(--paper); color: var(--paper-ink); border: 4px solid var(--edge); border-radius: 18px; padding: 22px 26px; width: min(980px, 100%); max-height: 100%; overflow: auto; touch-action: pan-y; }
+.card h2 { margin: 0 0 6px; font-size: clamp(24px, 3vw, 36px); font-weight: 900; }
+.card p { margin: 0 0 12px; }
+.bar0 { height: 14px; background: rgba(0,0,0,.15); border-radius: 8px; overflow: hidden; margin: 8px 0 14px; }
+.bar0 i { display: block; height: 100%; background: var(--ok); transition: width .3s; }
+.jgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.jz { background: rgba(0,0,0,.06); border-radius: 12px; padding: 10px 14px; }
+.jz h3 { margin: 0 0 6px; font-size: 18px; }
+.jz ul { margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.jz li { padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,.18); word-break: keep-all; }
+.jz li.lock { color: var(--soft); }
+.jz li b { color: var(--accent); }
+.crow { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+
+/* title */
+#title { background: radial-gradient(ellipse at 50% 30%, #3a5a3d, #101a14 70%); }
+#title .card { text-align: center; background: rgba(248,238,210,.96); }
+#title h1 { margin: 0; font-size: clamp(34px, 6vw, 66px); font-weight: 900; line-height: 1.2; color: var(--accent); }
+#title .sub { font-size: clamp(16px, 2vw, 22px); margin: 10px auto 16px; max-width: 34em; word-break: keep-all; }
+#title input { font: inherit; font-size: 20px; padding: 8px 14px; border: 3px solid var(--edge); border-radius: 12px; background: #fff; color: #222; width: 11em; text-align: center; user-select: text; }
+.keys { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 14px 0; font-size: 14px; }
+.keys span { background: rgba(0,0,0,.08); border-radius: 8px; padding: 3px 10px; }
+.keys kbd { background: var(--edge); color: #fff; border-radius: 5px; padding: 1px 7px; font-family: inherit; font-weight: 700; }
+#title .cbtn { font-size: 22px; padding: 12px 34px; }
+#title .cbtn.alt { background: #3b6fa8; }
+
+/* mini games */
+.torches { display: flex; gap: 14px; justify-content: center; font-size: clamp(34px, 6vw, 60px); margin: 10px 0 18px; }
+.tor { filter: grayscale(1) brightness(.6); transition: filter .3s, transform .3s; }
+.tor.on { filter: none; transform: scale(1.25); }
+.bar { position: relative; height: 46px; background: #e6d9b7; border: 3px solid var(--edge); border-radius: 12px; overflow: hidden; margin: 10px 0 16px; }
+.bar .zone { position: absolute; top: 0; bottom: 0; background: #53d27f; opacity: .9; }
+.bar .cur { position: absolute; top: -3px; bottom: -3px; width: 8px; background: var(--accent); margin-left: -4px; border-radius: 4px; }
+.mc { text-align: center; }
+.range { position: relative; height: 170px; background: linear-gradient(#bfe3f5, #e7f2d6 70%, #a5c97d); border: 3px solid var(--edge); border-radius: 12px; overflow: hidden; margin: 10px 0; }
+.range .aim { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--accent); opacity: .7; }
+.range .tgt { position: absolute; top: 34px; width: 100px; height: 100px; margin-left: -50px; border-radius: 50%; background: radial-gradient(circle, #d33 0 12%, #fff 12% 28%, #36c 28% 46%, #fff 46% 64%, #222 64% 82%, #fff 82% 100%); border: 2px solid #333; }
+.range .hit { position: absolute; top: 80px; font-size: 26px; transform: translateX(-50%); }
+.msg { min-height: 2em; font-weight: 700; font-size: 20px; margin: 6px 0; }
+#mm { width: 100%; height: auto; border: 3px solid var(--edge); border-radius: 10px; background: #000; display: block; }
+
+/* ending */
+.cert { text-align: center; border: 6px double var(--edge); padding: 22px; border-radius: 12px; background: #fffaf0; }
+.cert h2 { color: var(--accent); font-size: clamp(30px, 5vw, 56px); }
+.cert .big { font-size: clamp(22px, 3.2vw, 36px); font-weight: 900; margin: 10px 0; word-break: keep-all; }
+.conf { position: fixed; top: -40px; font-size: 28px; z-index: 60; pointer-events: none; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
+.pgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.pmapbox { background: #e9f1f7; border: 3px solid var(--edge); border-radius: 12px; padding: 6px; }
+.pmap { width: 100%; max-height: 66vh; display: block; }
+.pp { stroke: #fff; stroke-width: 2.2; cursor: pointer; transition: filter .15s; }
+.pp:hover { filter: brightness(.93); }
+.pp.on { stroke: #14213d; stroke-width: 3.5; }
+.pp.tg { animation: ptg .8s infinite alternate; }
+@keyframes ptg { from { filter: brightness(1); } to { filter: brightness(.7) saturate(1.6); } }
+.pname { font-family: "Noto Sans KR", sans-serif; font-weight: 900; fill: #2b1d10; paint-order: stroke; stroke: #fff; stroke-width: 3.5px; pointer-events: none; }
+.pcity { font: 700 11px "Noto Sans KR", sans-serif; fill: #14213d; paint-order: stroke; stroke: #fff; stroke-width: 3px; pointer-events: none; }
+.ppanel h3 { margin: 6px 0; font-size: clamp(20px, 2.4vw, 28px); }
+.ppanel p { margin: 6px 0; font-size: clamp(16px, 1.8vw, 20px); word-break: keep-all; }
+.plegend { display: flex; gap: 12px; flex-wrap: wrap; background: rgba(0,0,0,.07); border-radius: 10px; padding: 6px 12px; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.ptip { background: #fff8e3; border-left: 6px solid var(--gold); padding: 8px 12px; border-radius: 8px; font-size: 15px !important; }
+.pbtns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+.pbtn { background: #fff8e3; color: var(--paper-ink); border: 3px solid var(--edge); border-radius: 10px; padding: 10px; font-size: 18px; font-weight: 700; }
+.pbtn:hover:not(:disabled) { background: #ffe9a8; }
+.pbtn.ok { background: #bfe8cd; border-color: var(--ok); } .pbtn.bad { background: #f6c3bd; border-color: var(--no); }
+.pbtn:disabled { cursor: default; }
+.pfb { font-weight: 700; }
+#zq { background: rgba(20, 0, 0, .72); }
+#zq .card { border-color: #7a1010; background: #1d1416; color: #f3e6e6; text-align: center; }
+#zq h2 { color: #ff6b5e; }
+#zqS { color: #e0b7b2; font-size: 15px; margin: 0; }
+#zqQ { font-size: clamp(20px, 2.6vw, 30px); font-weight: 900; margin: 8px 0 0; word-break: keep-all; }
+.zbar { height: 12px; background: rgba(255,255,255,.15); border-radius: 6px; overflow: hidden; margin: 12px 0 16px; }
+.zbar i { display: block; height: 100%; background: #ff6b5e; width: 100%; }
+.zopts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.zopts button { background: #2b1d1f; color: #fff; border: 3px solid #ff6b5e; border-radius: 14px; padding: 16px; font-size: clamp(18px, 2.4vw, 26px); font-weight: 900; word-break: keep-all; }
+.zopts button:hover:not(:disabled) { background: #3d2629; }
+.zopts button:disabled { cursor: default; opacity: .75; }
+#zq .msg { color: #ffe0a0; }
+#flash { position: fixed; inset: 0; background: rgba(200,0,0,0); pointer-events: none; z-index: 26; transition: background .6s; }
+#flash.on { background: rgba(200,0,0,.38); transition: none; }
+.zt { display: inline-flex; gap: 8px; align-items: center; font-weight: 700; margin: 4px 0 2px; font-size: 17px; cursor: pointer; }
+.zt input { width: 20px; height: 20px; }
+.mgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+.mcard { min-height: 84px; border-radius: 10px; border: 3px solid #4a2c14; background: linear-gradient(#8a5a2a, #6b4320); color: #f1d37a; font-weight: 700; font-size: clamp(13px, 1.6vw, 17px); padding: 6px; word-break: keep-all; line-height: 1.3; position: relative; }
+.mcard::after { content: ""; position: absolute; left: 50%; bottom: 8px; width: 16px; height: 5px; margin-left: -8px; border-radius: 3px; background: #f1b72c; }
+.mcard.open::after, .mcard.done::after { display: none; }
+.mcard.open { background: #fff8e3; color: var(--paper-ink); border-color: var(--edge); }
+.mcard.open.term { background: #ffe9a8; font-size: clamp(16px, 2vw, 22px); font-weight: 900; }
+.mcard.done { background: #bfe8cd; color: #12432a; border-color: var(--ok); cursor: default; }
+.mcard.done.term { font-size: clamp(16px, 2vw, 22px); font-weight: 900; }
+.mcard.miss { animation: shake .35s; }
+@media (max-width: 760px) { .mgrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .pgrid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .jgrid { grid-template-columns: 1fr; } .dopts { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .shake, .conf { animation: none !important; } }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="hud" class="hide">
+  <div>
+    <span class="pill">🪙 <b id="hCoin">0</b></span>
+    <span class="pill" title="힌트 부적">🧿 <b id="hHint">0</b></span>
+    <span class="pill">📖 <b id="hStamp">0/23</b></span>
+    <span class="pill" id="hHp">❤️❤️❤️</span>
+    <div class="stam"><span id="hRun">👟 달리기 장착 (Shift)</span><div class="sbar"><i id="sFill"></i></div></div>
+  </div>
+  <div>
+    <button class="hbtn" id="bJ">📖 학습지 (J)</button>
+    <button class="hbtn" id="bM">🗺 지도 (M)</button>
+    <button class="hbtn" id="bS" aria-label="소리">🔊</button>
+    <button class="hbtn" id="bZ" aria-label="좀비 모드">🧟 ON</button>
+  </div>
+</div>
+<div id="zone"></div>
+<div id="prompt" class="hide"></div>
+<div id="racehud" class="hide"></div>
+<div id="toast"></div>
+<div id="keyhint" class="hide">WASD·방향키 이동 · Shift 달리기 · E 대화 · J 학습지 · M 지도 · 🧟 길에서는 좀비 조심!</div>
+
+<div id="pad" class="hide">
+  <div class="dp"><button class="w" data-k="w">▲</button><button class="a" data-k="a">◀</button><button class="s" data-k="s">▼</button><button class="d" data-k="d">▶</button></div>
+  <div class="ab"><button id="tAct">대화 E</button><button id="tRun">👟 달리기</button></div>
+</div>
+
+<div id="dlg" class="hide">
+  <div class="dbox" id="dbox">
+    <div class="dname" id="dname"></div>
+    <div class="dtext" id="dtext"></div>
+    <div class="dfb" id="dfb"></div>
+    <div class="dopts" id="dopts"></div>
+    <div class="dfoot"><span id="dhint"></span><button id="dnext">다음 ▶</button></div>
+  </div>
+</div>
+<div id="stamp">통과!</div>
+
+<div id="title" class="ov">
+  <div class="card">
+    <h1>조선 시간여행<br>통치 체제 탐험기</h1>
+    <p class="sub">낡은 학습지가 번쩍 빛나더니, 눈을 떠 보니 조선! 네 구역의 관청을 돌아다니며 통치 체제를 배우고 도장을 모두 모아 임금님을 만나자.</p>
+    <p class="sub" style="margin-top:-6px">🧟 그런데 밤이 되자 괴질이 퍼져 사람들이 좀비가 되었다! 등불이 밝은 관청 구역은 안전하지만, 길에서 붙잡히면 배운 지식으로 그들의 정신을 되찾게 해야 한다.</p>
+    <p><input id="nameIn" maxlength="8" placeholder="이름" aria-label="이름"></p>
+    <p><label class="zt"><input type="checkbox" id="zIn" checked> 🧟 좀비 모드 (밤 · 스릴러)</label></p>
+    <div class="keys"><span><kbd>W A S D</kbd> / <kbd>방향키</kbd> 이동</span><span><kbd>Shift</kbd> 달리기</span><span><kbd>E</kbd> / <kbd>Space</kbd> 대화</span><span><kbd>J</kbd> 학습지</span><span><kbd>M</kbd> 지도</span></div>
+    <div class="crow" style="justify-content:center">
+      <button class="cbtn alt hide" id="bCont">이어하기</button>
+      <button class="cbtn" id="bNew">새로 시작</button>
+    </div>
+  </div>
+</div>
+
+<div id="prov" class="ov hide"><div class="card" id="pcard"></div></div>
+<div id="journal" class="ov hide"><div class="card" id="jcard"></div></div>
+<div id="mapov" class="ov hide"><div class="card"><h2>🗺 한양 주변 지도</h2><canvas id="mm" width="640" height="480"></canvas><div class="crow"><button class="cbtn" id="mapClose">닫기 (M)</button></div></div></div>
+<div id="mini" class="ov hide"><div class="card mc"><h2 id="mTitle"></h2><p id="mDesc"></p><div id="mBody"></div><div class="msg" id="mRes"></div><div class="crow" style="justify-content:center" id="mBtns"></div></div></div>
+<div id="zq" class="ov hide"><div class="card"><h2 id="zqT">🧟 좀비에게 붙잡혔다!</h2><p id="zqS">8초 안에 정답을 외쳐 정신을 되찾게 하라!</p><p id="zqQ"></p><div class="zbar"><i id="zqBar"></i></div><div class="zopts" id="zqO"></div><div class="msg" id="zqR"></div></div></div>
+<div id="flash"></div>
+<div id="ending" class="ov hide"><div class="card" id="ecard"></div></div>
+
+<script>
+(function () {
+'use strict';
+var T = 32, MW = 64, MH = 48;
+var G = { GRASS: 0, ROAD: 1, FLOOR: 2, WALL: 3, WATER: 4, TREE: 5, BLD: 6, DIRT: 7, GATE: 8, FENCE: 9, COURT: 10, BEACON: 11, LOCK: 12, HALL: 13, STONE: 14, XWALL: 15 };
+var SOLID = {}; SOLID[G.WALL] = SOLID[G.WATER] = SOLID[G.TREE] = SOLID[G.BLD] = SOLID[G.FENCE] = SOLID[G.BEACON] = SOLID[G.LOCK] = SOLID[G.HALL] = SOLID[G.XWALL] = true;
+function $(id) { return document.getElementById(id); }
+function hs(x, y) { var n = Math.imul(x | 0, 374761393) + Math.imul(y | 0, 668265263); n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) % 1000 / 1000; }
+function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuf(a) { var b = a.slice(); for (var i = b.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+
+/* ---------- audio ---------- */
+var AC = null, muted = false;
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } } if (AC && AC.state === 'suspended') { try { AC.resume(); } catch (e) {} } return AC; }
+function tone(f, d, type, vol, when) {
+  if (muted) return; var a = ac(); if (!a) return;
+  try {
+    var o = a.createOscillator(), g = a.createGain(), t = a.currentTime + (when || 0);
+    o.type = type || 'square'; o.frequency.value = f;
+    g.gain.setValueAtTime(vol || 0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + 0.02);
+  } catch (e) {}
+}
+var sfx = {
+  coin: function () { tone(988, .08); tone(1319, .14, 'square', .05, .07); },
+  ok: function () { tone(523, .1); tone(659, .1, 'square', .05, .1); tone(784, .22, 'square', .05, .2); },
+  no: function () { tone(170, .25, 'sawtooth', .05); },
+  stamp: function () { tone(110, .18, 'square', .09); tone(80, .25, 'triangle', .09, .05); },
+  ui: function () { tone(660, .05, 'square', .03); },
+  fan: function () {
+    [[392, .1, 0], [392, .1, .12], [392, .1, .24], [523, .6, .38], [659, .6, .38], [784, .6, .38]].forEach(function (n) { trumpet(n[0], n[1], n[2]); });
+  },
+  fanBig: function () {
+    [[392, .1, 0], [392, .1, .12], [392, .1, .24], [523, .5, .38], [659, .5, .38], [784, .5, .38],
+     [523, .16, 1.0], [659, .16, 1.17], [784, .16, 1.34], [1046, .9, 1.52], [784, .9, 1.52], [659, .9, 1.52], [523, .9, 1.52]].forEach(function (n) { trumpet(n[0], n[1], n[2]); });
+    tone(98, .25, 'triangle', .1, 0); tone(98, .25, 'triangle', .1, 1.5);
+  },
+  win: function () { sfx.fanBig(); burst(24); }
+};
+function trumpet(f, d, when) { tone(f, d, 'sawtooth', .04, when); tone(f * 2, d, 'square', .015, when); }
+function burst(n) {
+  try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+  for (var i = 0; i < n; i++) (function (i) {
+    var s = document.createElement('span'); s.className = 'conf'; s.textContent = ['🎉', '🪙', '✨', '🎊'][i % 4];
+    s.style.left = Math.random() * 100 + 'vw'; s.style.animationDuration = (1.8 + Math.random() * 1.8) + 's'; s.style.animationDelay = Math.random() * .4 + 's';
+    document.body.appendChild(s); setTimeout(function () { s.remove(); }, 4500);
+  })(i);
+}
+
+/* ---------- save ---------- */
+var KEY = 'joseon-rpg-v1';
+var S = null;
+function freshSave() { return { name: '학생', coins: 0, hints: 0, stamps: {}, got: {}, chests: {}, wrongs: 0, streak: 0, minis: {}, x: 0, y: 0, done: false, intro: false, samsa: false, sign: false, bond: false, part: {}, hp: 3, zoff: false, cured: 0 }; }
+function save() { try { if (S) { S.x = P.x; S.y = P.y; localStorage.setItem(KEY, JSON.stringify(S)); } } catch (e) {} }
+function loadSave() { try { var r = localStorage.getItem(KEY); if (!r) return null; var o = JSON.parse(r); var f = freshSave(); for (var k in f) if (!(k in o)) o[k] = f[k]; return o; } catch (e) { return null; } }
+
+/* ---------- map ---------- */
+var map = [], blk = new Uint8Array(MW * MH);
+for (var yy = 0; yy < MH; yy++) map.push(new Uint8Array(MW));
+function R(t, x, y, w, h) { for (var j = y; j < y + h; j++) for (var i = x; i < x + w; i++) if (i >= 0 && j >= 0 && i < MW && j < MH) map[j][i] = t; }
+var ZONES = [
+  { n: '궁궐 (경복궁)', s: '(1) 중앙 정치 제도', r: [18, 2, 27, 16] },
+  { n: '감영 마을', s: '(2) 지방 행정 제도', r: [46, 3, 16, 16] },
+  { n: '군영 · 역참', s: '(3) 군사 · 교통 · 통신 제도', r: [2, 27, 27, 18] },
+  { n: '과거장 · 성균관', s: '(4) 관리 등용 · 교육 제도', r: [35, 27, 26, 18] }
+];
+function zoneAt(tx, ty) { for (var i = 0; i < ZONES.length; i++) { var r = ZONES[i].r; if (tx >= r[0] && tx < r[0] + r[2] && ty >= r[1] && ty < r[1] + r[3]) return i; } return -1; }
+
+function buildMap() {
+  R(G.GRASS, 0, 0, MW, MH);
+  R(G.ROAD, 1, 22, 62, 3); R(G.ROAD, 30, 1, 3, 46);
+  // 궁궐
+  R(G.STONE, 18, 2, 27, 16);
+  R(G.WALL, 18, 2, 27, 1); R(G.WALL, 18, 17, 27, 1); R(G.WALL, 18, 2, 1, 16); R(G.WALL, 44, 2, 1, 16);
+  R(G.LOCK, 44, 10, 1, 2);
+  R(G.HALL, 27, 15, 9, 3); R(G.STONE, 30, 15, 3, 3);   // 광화문 (가운데가 통로)
+  R(G.HALL, 26, 3, 11, 4);                              // 근정전
+  R(G.WATER, 19, 3, 6, 5); R(G.WATER, 39, 3, 5, 5);    // 경회루·향원정 연못
+  R(G.WATER, 19, 12, 25, 1); R(G.STONE, 30, 12, 3, 1); // 금천과 영제교
+  R(G.HALL, 37, 13, 7, 2);                              // 3사 청사
+  // 감영 마을
+  R(G.DIRT, 46, 3, 16, 16);
+  R(G.FENCE, 46, 3, 16, 1); R(G.FENCE, 46, 18, 16, 1); R(G.FENCE, 46, 3, 1, 16); R(G.FENCE, 61, 3, 1, 16);
+  R(G.ROAD, 53, 18, 2, 1); R(G.ROAD, 46, 10, 1, 2); R(G.ROAD, 53, 19, 2, 3); R(G.ROAD, 45, 10, 1, 2);
+  R(G.BLD, 48, 5, 5, 3); R(G.BLD, 55, 5, 5, 3); R(G.BLD, 48, 16, 3, 2); R(G.BLD, 57, 16, 3, 2);
+  // 군영 · 역참
+  R(G.DIRT, 2, 27, 27, 18);
+  R(G.WATER, 3, 39, 8, 5);
+  R(G.BLD, 4, 28, 5, 3); R(G.BLD, 11, 28, 5, 3); R(G.BEACON, 21, 29, 3, 3); R(G.BLD, 16, 41, 6, 3);
+  // 과거장 · 성균관
+  R(G.COURT, 35, 27, 26, 18);
+  [37, 43, 47].forEach(function (x) { R(G.BLD, x, 35, 3, 2); }); R(G.BLD, 55, 28, 3, 2);
+  R(G.XWALL, 36, 27, 14, 1); R(G.XWALL, 36, 33, 14, 1); R(G.XWALL, 36, 27, 1, 7); R(G.XWALL, 49, 27, 1, 7); R(G.COURT, 42, 33, 3, 1);
+  R(G.HALL, 52, 33, 9, 5);
+  // 숲
+  R(G.TREE, 0, 0, MW, 1); R(G.TREE, 0, MH - 1, MW, 1); R(G.TREE, 0, 0, 1, MH); R(G.TREE, MW - 1, 0, 1, MH);
+  for (var y = 1; y < MH - 1; y++) for (var x = 1; x < MW - 1; x++) {
+    if (map[y][x] !== G.GRASS) continue;
+    var skip = false;
+    for (var z = 0; z < ZONES.length; z++) { var r = ZONES[z].r; if (x >= r[0] - 2 && x < r[0] + r[2] + 2 && y >= r[1] - 2 && y < r[1] + r[3] + 2) skip = true; }
+    if (y >= 20 && y <= 26) skip = true;
+    if (x >= 28 && x <= 34) skip = true;
+    if (!skip && hs(x * 3 + 7, y * 5 + 1) > 0.86) map[y][x] = G.TREE;
+  }
+}
+buildMap();
+
+/* ---------- NPC data ---------- */
+var NPCS = [];
+function N(id, z, x, y, label, name, look, lines, q, o, sum, mini) {
+  NPCS.push({ id: id, z: z, tx: x, ty: y, label: label, name: name, look: look, lines: lines, q: q, o: o, a: o[0], sum: sum, mini: mini || null, type: 'lesson' });
+}
+var C = { navy: '#2f4a8a', green: '#3d6b4a', purple: '#7a3f8c', red: '#8a2f2f', teal: '#2f7a8a', gold: '#8a6a2f', white: '#e8e3d3', brown: '#7a6a55', wood: '#6b4a2f', sea: '#2f5a7a', orange: '#a86a2f' };
+// 정답은 항상 o[0] (게임에서 섞어서 보여 줌)
+N('uijeongbu', 0, 22, 10, '영의정', '의정부', { robe: C.navy, hat: 'gwan' },
+  ['어서 오게, 이방인. 나는 의정부의 영의정이네.', '의정부는 재상들이 모여 나라의 중요한 일을 합의해 의논하는 조선 최고의 합의 기구라네.'],
+  '재상들이 모여 국정을 합의해 의논하던 최고 기구는?', ['의정부', '승정원', '성균관', '사간원'], '재상들이 국정을 합의하는 최고 합의 기구');
+N('yukjo', 0, 26, 10, '6조 판서', '6조', { robe: C.green, hat: 'gwan' },
+  ['나는 6조의 판서다. 이조·호조·예조·병조·형조·공조, 여섯 부서를 합쳐 6조라 하지.', '의정부에서 정한 일을 부서별로 나누어 실제로 집행하는 행정 실무 기관이야.'],
+  '의정부 아래에서 행정 실무를 여섯 부서로 나누어 집행한 기관은?', ['6조', '홍문관', '승정원', '의정부'], '6개 부서가 행정 실무를 집행');
+N('seungjeongwon', 0, 36, 10, '도승지', '승정원', { robe: C.purple, hat: 'gwan' },
+  ['나는 승정원의 도승지요. 왕의 곁에서 일하는 비서 기관이라오.', '왕의 명령을 신하들에게 전하고, 신하들의 보고를 왕에게 올리는 일을 하오.'],
+  '왕명을 전달하고 신하의 보고를 왕에게 올린 비서 기관은?', ['승정원', '의정부', '사헌부', '6조'], '왕명을 출납하는 왕의 비서 기관');
+N('saheonbu', 0, 38, 15, '대사헌', '사헌부', { robe: C.red, hat: 'gwan' },
+  ['나는 사헌부의 대사헌이오. 관리들의 잘못과 비리를 감찰하는 곳이지.', '사헌부·사간원·홍문관을 합쳐 3사라고 하며, 언론 기능으로 왕과 관리를 견제했소.'],
+  '관리들의 잘못을 감찰하고 따진 3사의 기관은?', ['사헌부', '사간원', '홍문관', '승정원'], '관리의 비리를 감찰 (3사)');
+N('sagan', 0, 40, 15, '대사간', '사간원', { robe: C.teal, hat: 'gwan' },
+  ['나는 사간원의 대사간이오. 왕에게 옳은 말을 아뢰는 일을 하오.', '왕이 잘못된 결정을 하려 하면 간언해서 바로잡으려 하지. 이것도 3사의 역할이오.'],
+  '왕에게 옳은 말을 간언해 잘못을 바로잡으려 한 3사의 기관은?', ['사간원', '사헌부', '의정부', '6조'], '왕에게 간언 (3사)');
+N('hongmun', 0, 42, 15, '대제학', '홍문관', { robe: C.gold, hat: 'gwan' },
+  ['나는 홍문관의 대제학이오. 책과 학문을 다루는 곳이지.', '왕의 학문과 정책 자문에 응하고 경연에도 참여하오. 3사의 마지막 기관이라오.'],
+  '왕의 학문과 정책 자문에 응한 3사의 기관은?', ['홍문관', '사헌부', '사간원', '승정원'], '왕의 학문·정책 자문 (3사)');
+N('gwanchal', 1, 50, 9, '관찰사', '관찰사', { robe: C.navy, hat: 'gwan' },
+  ['나는 도를 다스리는 관찰사다. 조선은 전국을 8개의 도로 나누었고, 도마다 관찰사를 파견했지.', '그러니까 관찰사는 중앙에서 도에 내려보낸 최고 지방관이다.'],
+  '도에 파견되어 그 지역을 다스린 최고 지방관은?', ['관찰사', '수령', '향리', '병마절도사'], '8도에 파견된 도의 최고 지방관');
+N('suryeong', 1, 56, 9, '고을 수령', '수령', { robe: C.green, hat: 'gwan' },
+  ['나는 이 고을의 수령이오. 부·목·군·현에 파견되는 지방관이지.', '백성을 직접 다스리며 행정·사법·군사의 일을 맡고 있소.'],
+  '부·목·군·현에 파견되어 행정·사법·군사를 맡은 지방관은?', ['수령', '관찰사', '향리', '유향소'], '부·목·군·현에 파견, 행정·사법·군사');
+N('hyangri', 1, 58, 9, '향리', '향리', { robe: C.brown, hat: 'band' },
+  ['나는 이 고을의 향리요. 수령 밑에서 일하는 하급 관리지.', '수령이 정한 일을 실제로 처리하는 행정 실무를 맡소.'],
+  '수령 아래에서 행정 실무를 맡은 지방 하급 관리는?', ['향리', '수령', '관찰사', '유향소'], '수령 아래 행정 실무를 맡은 하급 관리');
+N('yuhyangso', 1, 57, 14, '좌수', '유향소', { robe: C.white, hat: 'gat' },
+  ['나는 유향소의 좌수라네. 이 고을 양반들이 모여 만든 기구지.', '수령을 보좌하고, 향리를 감찰하고, 백성을 교화하는 일을 한다네.'],
+  '지방 양반이 만들어 수령을 보좌하고 향리를 감찰한 기구는?', ['유향소', '향리', '수령', '향교'], '양반이 수령 보좌·향리 감찰·백성 교화');
+N('nopa', 1, 51, 13, '노파', '고려·조선 비교', { robe: '#a89cc0', hat: 'bun', cane: true }, ['x'], 'x', ['x'], '고려와 달리 조선은 ① 향·부곡·소 ② 양계 ③ 속현이 사라짐');
+(function () {
+  var n = NPCS[NPCS.length - 1];
+  n.intro = ['허허, 먼 길 온 이방인이로군. 이 늙은이는 고려 때부터 이 고을에서 살았다오.', '고려와 조선은 시골 다스리는 법이 크게 달라졌소. 학습지의 ①②③ 칸에 쓸 세 가지만 기억하시오. 사라진 것이 세 가지라오!'];
+  n.parts = [
+    { lines: ['첫째(①), 향·부곡·소가 사라졌소.', '고려에는 향·부곡·소라는 특별한 마을이 있었소. 이곳 사람들은 일반 군현보다 차별을 받았는데, 조선에서는 이런 특수 행정 구역이 사라지고 일반 군현이 되었다오.'],
+      q: '고려에는 있었지만 조선에서는 사라진 특수 행정 구역은?', o: ['향·부곡·소', '8도', '부·목·군·현', '도호부'], sum: '① 향·부곡·소(특수 행정 구역)가 사라짐' },
+    { lines: ['둘째(②), 양계가 사라졌소.', '고려에는 북쪽 국경 지역을 군사 행정 구역인 양계(북계·동계)로 따로 다스렸소. 조선에서는 양계가 없어지고, 그 땅도 평안도·함경도가 되어 전국이 8도로 정비되었다오.'],
+      q: '고려에서 북쪽 국경 지역에 두었던 군사 행정 구역으로, 조선에서 사라진 것은?', o: ['양계', '5도', '향·부곡·소', '속현'], sum: '② 양계(군사 행정 구역)가 사라짐 → 평안도·함경도, 전국 8도' },
+    { lines: ['셋째(③), 속현이 사라졌소.', '고려에는 수령이 파견되지 않은 속현이 많아서, 이웃 고을 수령이 대신 다스렸소. 조선에서는 속현이 없어지고 모든 군현에 수령이 파견되었다오.'],
+      q: '고려에서 수령이 직접 파견되지 않았으나 조선에서는 사라진 군현은?', o: ['속현', '주현', '도호부', '목'], sum: '③ 속현이 사라짐 → 모든 군현에 수령 파견' }
+  ];
+})();
+N('owi', 2, 6, 32, '5위 군사', '5위', { robe: C.wood, hat: 'helm' },
+  ['나는 5위의 군사다. 우리는 중앙군으로, 한양에 주둔한다.', '5위는 궁궐과 한양을 지키는 일을 맡는다.'],
+  '궁궐과 한양을 방어한 중앙군 조직은?', ['5위', '병마절도사', '수군절도사', '봉수제'], '궁궐·한양을 지킨 중앙군');
+N('byeongma', 2, 13, 32, '병마절도사', '병마절도사', { robe: C.red, hat: 'helm' },
+  ['나는 병마절도사다. 지방의 육군을 지휘하는 장수지.', '각 지방에서 군대를 이끌고 나라를 지키는 것이 내 임무다.'],
+  '지방의 육군을 지휘한 지휘관은?', ['병마절도사', '수군절도사', '관찰사', '수령'], '지방 육군의 지휘관');
+N('sugun', 2, 7, 37, '수군절도사', '수군절도사', { robe: C.sea, hat: 'helm' },
+  ['나는 수군절도사다. 바다와 강을 지키는 수군을 지휘한다.', '배를 타고 해안을 지키는 일을 맡고 있지.'],
+  '지방의 수군을 지휘한 지휘관은?', ['수군절도사', '병마절도사', '향리', '유향소'], '지방 수군의 지휘관');
+N('bongsu', 2, 22, 33, '봉수군', '봉수제', { robe: C.brown, hat: 'band' },
+  ['나는 봉수대를 지키는 봉수군이다. 높은 산마다 봉수대가 있지.', '적이 나타나면 밤에는 횃불, 낮에는 연기로 신호를 올려 한양까지 급한 소식을 전한다. 이것을 봉수제라 한다.'],
+  '횃불과 연기로 급한 소식을 전한 통신 제도는?', ['봉수제', '역참제', '5위', '병마절도사'], '횃불·연기로 급한 소식 전달', 'beacon');
+N('yeokcham', 2, 18, 38, '역졸', '역참제', { robe: C.orange, hat: 'band' },
+  ['나는 역참의 역졸이다. 길마다 역(참)을 두어 말과 숙소를 마련했지.', '공문서와 물자를 전달하고, 관리들이 이동할 때 말을 바꿔 타고 쉬어 가게 했다. 이것이 역참제다.'],
+  '길에 역을 두어 공문서 전달과 관리의 이동을 돕던 제도는?', ['역참제', '봉수제', '5위', '향교'], '역에서 공문서 전달·관리 이동 지원', 'race');
+N('sogwa', 3, 37, 31, '소과 시험관', '소과', { robe: C.teal, hat: 'gat' },
+  ['나는 소과 시험관이오. 문관이 되는 길은 소과와 대과, 두 단계로 나눌 수 있소. 그 첫 단계가 소과요.', '소과는 유교 경전을 보는 생원시와 글짓기를 보는 진사시로 나뉘오. 합격하면 생원·진사가 되어 성균관에 입학할 자격을 얻소.'],
+  '생원시와 진사시로 나뉘며, 합격하면 성균관 입학 자격을 주는 시험은?', ['소과', '대과', '무과', '잡과'], '소과(생원시·진사시) 합격 → 성균관 입학 자격');
+N('munkwa', 3, 39, 31, '문과 시험관', '문과', { robe: C.navy, hat: 'gat' },
+  ['나는 문과 시험관이네. 과거 시험은 문과, 무과, 잡과 세 종류가 있었지.', '그중 문과는 문관을 뽑는 시험이네. 문과의 길에는 소과와 대과가 있으니, 양옆의 시험관들도 만나 보게나.'],
+  '문관을 뽑는 과거 시험은?', ['문과', '무과', '잡과', '음서'], '과거: 문관 선발 (소과 → 대과)');
+N('daegwa', 3, 41, 31, '대과 시험관', '대과', { robe: C.purple, hat: 'gat' },
+  ['나는 대과 시험관이오. 대과는 문과의 두 번째 단계로, 소과 다음에 치르는 시험이오.', '소과에 합격하고 성균관에서 공부한 유생들이 응시했으며, 합격하면 문관으로 관직에 나갈 수 있소.'],
+  '소과에 합격한 뒤 성균관 유생 등이 응시하며, 합격하면 문관으로 나가는 시험은?', ['대과', '소과', '음서', '천거'], '소과·성균관 이후 응시, 합격하면 문관으로 관직 진출');
+N('mugwa', 3, 43, 31, '무과 시험관', '무과', { robe: C.red, hat: 'helm' },
+  ['나는 무과 시험관이다. 무과는 무인, 즉 무관을 뽑는 과거 시험이지.', '활쏘기 같은 무예 실력을 겨룬다.'],
+  '무관을 뽑는 과거 시험은?', ['무과', '문과', '잡과', '천거'], '과거: 무관 선발', 'archery');
+N('japgwa', 3, 47, 31, '잡과 시험관', '잡과', { robe: C.green, hat: 'gat' },
+  ['나는 잡과 시험관이오. 기술관을 뽑는 과거 시험이지.', '통역을 맡는 역관, 의술을 맡는 의관 같은 전문 기술직을 뽑았소.'],
+  '역관·의관 같은 기술관을 뽑는 시험은?', ['잡과', '문과', '무과', '음서'], '과거: 기술관 선발');
+N('eumseo', 3, 56, 31, '음서 담당', '음서', { robe: C.purple, hat: 'gwan' },
+  ['나는 음서를 담당하오. 음서는 시험 없이 관직에 나가는 제도라오.', '높은 관리의 자손이라는 조상의 덕으로 관직에 오를 수 있었지.'],
+  '시험 없이 조상의 덕으로 관직에 나가는 제도는?', ['음서', '천거', '과거', '향교'], '시험 없이 조상 덕으로 관직 진출');
+N('cheongeo', 3, 38, 38, '천거 담당', '천거', { robe: C.teal, hat: 'gwan' },
+  ['나는 천거를 담당하오. 천거는 추천으로 관리를 뽑는 제도라오.', '학식과 덕이 뛰어난 인물을 누군가 추천하면 관직에 등용했소.'],
+  '추천을 받아 관리가 되는 제도는?', ['천거', '음서', '문과', '잡과'], '추천으로 관리 등용');
+N('sabu', 3, 44, 38, '훈도', '4부 학당', { robe: C.white, hat: 'gat' },
+  ['나는 4부 학당의 훈도요. 한양의 4개 부에 세운 관립 교육 기관이지.', '한양의 학생들을 가르쳤소.'],
+  '한양의 4개 부에 설치된 관립 교육 기관은?', ['4부 학당', '향교', '성균관', '서당'], '한양 4개 부의 관립 교육 기관');
+N('hyanggyo', 3, 48, 38, '교수', '향교', { robe: C.white, hat: 'gat' },
+  ['나는 향교의 교수요. 지방 군현마다 세운 관립 교육 기관이지.', '지방의 학생들이 여기서 공부했소.'],
+  '지방 군현에 설치된 관립 교육 기관은?', ['향교', '4부 학당', '성균관', '서당'], '지방 군현의 관립 교육 기관');
+N('seonggyun', 3, 56, 38, '대사성', '성균관', { robe: C.navy, hat: 'gat' },
+  ['나는 성균관의 대사성이오. 조선 최고의 교육 기관이지.', '한양에 있으며 나라의 인재를 기르는 곳이오.'],
+  '한양에 있던 조선 최고의 교육 기관은?', ['성균관', '향교', '4부 학당', '서당'], '한양의 최고 교육 기관');
+// 봉수제 보기 중복 제거
+NPCS.forEach(function (n) { var seen = {}; n.o = n.o.filter(function (t) { if (seen[t]) return false; seen[t] = 1; return true; }); });
+// 이름표에 정답(직책·기관명)이 드러나지 않도록 인물 이름을 붙임
+var RENAME = { yukjo: '신여량', gwanchal: '정윤겸', suryeong: '한기석', hyangri: '최막동', yuhyangso: '서진익',
+  owi: '강돌쇠', byeongma: '권무혁', sugun: '이해룡', bongsu: '박칠복', yeokcham: '오만석',
+  sogwa: '남궁선', munkwa: '조경환', daegwa: '홍재윤', mugwa: '장도윤', japgwa: '허정민', eumseo: '민세창', cheongeo: '송치헌' };
+NPCS.forEach(function (n) { if (RENAME[n.id]) { n.role = n.label; n.label = RENAME[n.id]; } });
+NPCS.forEach(function (n) { if (n.id === 'japgwa') n.mini = 'memory'; });
+var TOTAL = NPCS.length;
+var SPECIAL = [
+  { id: 'goblin', type: 'goblin', tx: 28, ty: 20, label: '도깨비', look: { robe: '#4aa36a', hat: 'horn' } },
+  { id: 'shop', type: 'shop', tx: 28, ty: 26, label: '보부상', look: { robe: '#c0773a', hat: 'gat' } },
+  { id: 'sign8', type: 'sign', tx: 52, ty: 16, label: '8도 안내판', look: {} },
+  { id: 'king', type: 'king', tx: 31, ty: 8, label: '임금님', look: { robe: '#c0392b', hat: 'crown' } }
+];
+var ALL = NPCS.concat(SPECIAL);
+ALL.forEach(function (n) { blk[n.ty * MW + n.tx] = 1; n.px = (n.tx + .5) * T; n.py = (n.ty + .5) * T; });
+blk[9 * MW + 57] = 1;
+for (var by = 8; by <= 11; by++) { blk[by * MW + 28] = 1; blk[by * MW + 34] = 1; }
+[[37, 28], [39, 28], [41, 28], [42, 28], [44, 28], [46, 28], [48, 28]].forEach(function (p) { blk[p[1] * MW + p[0]] = 1; });
+
+var FINAL_POOL = [
+  { q: '도에 파견된 최고 지방관은?', o: ['관찰사', '수령', '향리', '유향소'] },
+  { q: '왕명을 전달하고 신하의 보고를 왕에게 올린 기관은?', o: ['승정원', '의정부', '사헌부', '6조'] },
+  { q: '궁궐과 한양을 지킨 중앙군 조직은?', o: ['5위', '병마절도사', '수군절도사', '봉수제'] },
+  { q: '시험 없이 조상의 덕으로 관직에 나가는 제도는?', o: ['음서', '천거', '문과', '무과'] },
+  { q: '지방 군현에 설치된 관립 교육 기관은?', o: ['향교', '4부 학당', '성균관', '서당'] },
+  { q: '횃불과 연기로 급한 소식을 전한 제도는?', o: ['봉수제', '역참제', '5위', '천거'] },
+  { q: '수령을 보좌하고 향리를 감찰한 지방 양반의 기구는?', o: ['유향소', '향리', '수령', '향교'] },
+  { q: '왕에게 옳은 말을 간언한 3사의 기관은?', o: ['사간원', '사헌부', '홍문관', '의정부'] },
+  { q: '역관·의관 같은 기술관을 뽑은 과거 시험은?', o: ['잡과', '문과', '무과', '음서'] },
+  { q: '의정부 아래에서 행정 실무를 나누어 맡은 기관은?', o: ['6조', '승정원', '홍문관', '사헌부'] },
+  { q: '지방 수군을 지휘한 지휘관은?', o: ['수군절도사', '병마절도사', '수령', '관찰사'] },
+  { q: '조선에서 사라진, 고려의 특수 행정 구역은?', o: ['향·부곡·소', '8도', '수령', '관찰사'] },
+  { q: '고려의 북쪽 국경 지역 군사 행정 구역으로 조선에서 사라진 것은?', o: ['양계', '8도', '도호부', '유향소'] },
+  { q: '조선 최고의 교육 기관은?', o: ['성균관', '향교', '4부 학당', '서당'] },
+  { q: '생원시·진사시로 나뉘며 합격하면 성균관 입학 자격을 주는 시험은?', o: ['소과', '대과', '무과', '잡과'] }
+];
+
+/* ---------- decoration positions ---------- */
+var COINS = [], CHESTS = [{ tx: 6, ty: 18 }, { tx: 58, ty: 25 }, { tx: 14, ty: 25 }];
+CHESTS.forEach(function (c) { for (var j = -1; j <= 1; j++) for (var i = -1; i <= 1; i++) { var x = c.tx + i, y = c.ty + j; if (x > 0 && y > 0 && x < MW - 1 && y < MH - 1 && map[y][x] === G.TREE) map[y][x] = G.GRASS; } blk[c.ty * MW + c.tx] = 0; });
+(function () {
+  var r = rng(20260), n = 0, guard = 0;
+  while (n < 34 && guard++ < 4000) {
+    var x = 2 + Math.floor(r() * (MW - 4)), y = 2 + Math.floor(r() * (MH - 4));
+    var t = map[y][x];
+    if (SOLID[t] || blk[y * MW + x]) continue;
+    var near = false; ALL.forEach(function (a) { if (Math.abs(a.tx - x) + Math.abs(a.ty - y) < 2) near = true; });
+    CHESTS.forEach(function (c) { if (c.tx === x && c.ty === y) near = true; });
+    if (near) continue;
+    COINS.push({ tx: x, ty: y, i: n }); n++;
+  }
+})();
+var RACE_PTS = [[24, 38], [27, 32], [31, 26], [21, 23], [18, 36]];
+RACE_PTS.forEach(function (p) { if (SOLID[map[p[1]][p[0]]]) map[p[1]][p[0]] = G.GRASS; });
+
+/* ---------- pre-render map ---------- */
+var SPAWN_SAFE = [28, 18, 7, 4];
+function safeTile(tx, ty) {
+  if (zoneAt(tx, ty) >= 0) return true;
+  if (tx >= SPAWN_SAFE[0] && tx < SPAWN_SAFE[0] + SPAWN_SAFE[2] && ty >= SPAWN_SAFE[1] && ty < SPAWN_SAFE[1] + SPAWN_SAFE[3]) return true;
+  return Math.abs(tx - 28) <= 2 && Math.abs(ty - 26) <= 2;
+}
+var WILD = [];
+(function () {
+  var seen = new Uint8Array(MW * MH), q = [[31, 20]], h = 0; seen[20 * MW + 31] = 1;
+  while (h < q.length) { var c = q[h++]; for (var k = 0; k < 4; k++) { var nx = c[0] + [1, -1, 0, 0][k], ny = c[1] + [0, 0, 1, -1][k]; if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue; var id = ny * MW + nx; if (seen[id] || SOLID[map[ny][nx]] || blk[id]) continue; seen[id] = 1; q.push([nx, ny]); } }
+  for (var y = 0; y < MH; y++) for (var x = 0; x < MW; x++) if (seen[y * MW + x] && !safeTile(x, y)) WILD.push([x, y]);
+})();
+var mapCv = document.createElement('canvas'); mapCv.width = MW * T; mapCv.height = MH * T;
+function rc(c, col, x, y, w, h) { c.fillStyle = col; c.fillRect(x, y, w, h); }
+function isB(x, y) { return x >= 0 && y >= 0 && x < MW && y < MH && map[y][x] === G.BLD; }
+function drawTile(c, t, x, y) {
+  var px = x * T, py = y * T, h = hs(x, y);
+  switch (t) {
+    case G.GRASS: case G.TREE:
+      rc(c, '#78b45c', px, py, T, T);
+      if (h > .55) rc(c, '#6aa650', px + (h * 97 | 0) % 24 + 2, py + (h * 53 | 0) % 24 + 2, 4, 2);
+      if (h < .3) rc(c, '#84c067', px + (h * 211 | 0) % 24 + 3, py + (h * 91 | 0) % 24 + 3, 3, 2);
+      if (h > .965) { rc(c, '#f2a1c2', px + 10, py + 12, 3, 3); rc(c, '#fff3a0', px + 11, py + 13, 1, 1); }
+      if (t === G.TREE) {
+        c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(px + 16, py + 29, 11, 4, 0, 0, 7); c.fill();
+        rc(c, '#6b4a2a', px + 14, py + 18, 5, 12);
+        c.fillStyle = '#2f7d3a'; c.beginPath(); c.arc(px + 16, py + 14, 13, 0, 7); c.fill();
+        c.fillStyle = '#3e9a4b'; c.beginPath(); c.arc(px + 12, py + 10, 6, 0, 7); c.fill();
+      }
+      break;
+    case G.ROAD:
+      rc(c, '#d7c297', px, py, T, T);
+      if (h > .5) rc(c, '#c6af82', px + (h * 131 | 0) % 26 + 2, py + (h * 71 | 0) % 26 + 2, 3, 2);
+      if (h < .2) rc(c, '#e3d1a9', px + (h * 311 | 0) % 24 + 3, py + (h * 41 | 0) % 24 + 3, 4, 2);
+      break;
+    case G.FLOOR: case G.GATE:
+      rc(c, '#dccda8', px, py, T, T); rc(c, '#c9b88d', px, py + 15, T, 2); rc(c, '#c9b88d', px + 15, py, 2, T);
+      if (t === G.GATE && x === 44) { if (y === 10) rc(c, '#b3382c', px, py, T, 5); if (y === 11) rc(c, '#b3382c', px, py + 27, T, 5); rc(c, '#7e231b', px, py + (y === 10 ? 5 : 25), T, 2); }
+      else if (t === G.GATE) { rc(c, '#b3382c', px, py, T, 7); rc(c, '#7e231b', px, py + 7, T, 2); if (x === 30) rc(c, '#b3382c', px, py, 5, T); if (x === 32) rc(c, '#b3382c', px + 27, py, 5, T); }
+      break;
+    case G.LOCK:
+      rc(c, '#a39a8b', px, py, T, T); rc(c, '#5e1f1f', px + 2, py + 1, T - 4, T - 2); rc(c, '#8a2f2f', px + 4, py + 3, T - 8, T - 6);
+      rc(c, '#f1b72c', px + 8, py + 8, 3, 3); rc(c, '#f1b72c', px + 21, py + 8, 3, 3); rc(c, '#f1b72c', px + 8, py + 21, 3, 3); rc(c, '#f1b72c', px + 21, py + 21, 3, 3);
+      rc(c, '#4a4a4a', px, py + 14, T, 4);
+      if (y === 10) { rc(c, '#f1b72c', px + 11, py + 22, 10, 8); rc(c, '#7a5410', px + 15, py + 25, 2, 3); }
+      break;
+    case G.WALL:
+      rc(c, '#b8ad9b', px, py, T, T); rc(c, '#4c5c6e', px, py, T, 8); rc(c, '#2f3a47', px, py + 8, T, 2); rc(c, '#6b7d92', px, py, T, 2);
+      for (var wk = 0; wk < T; wk += 8) rc(c, '#3e4c5c', px + wk, py + 2, 2, 6);
+      rc(c, '#9a8f7c', px, py + 20, T, 2); rc(c, '#9a8f7c', px + (y % 2 ? 10 : 22), py + 10, 2, 10); rc(c, '#9a8f7c', px + (y % 2 ? 24 : 8), py + 22, 2, 10);
+      break;
+    case G.STONE:
+      var royal = x >= 30 && x <= 32 && y >= 7 && y <= 17;
+      rc(c, royal ? '#d3d0c6' : '#b9b6ad', px, py, T, T);
+      rc(c, royal ? '#b4b1a6' : '#a5a299', px, py, T, 1); rc(c, royal ? '#b4b1a6' : '#a5a299', px, py, 1, T);
+      rc(c, royal ? '#b4b1a6' : '#a5a299', px, py + 8 + (h * 10 | 0), T, 1); rc(c, royal ? '#b4b1a6' : '#a5a299', px + 10 + (h * 9 | 0), py, 1, T);
+      if (h > .6) rc(c, royal ? '#e2dfd5' : '#c8c5bc', px + (h * 77 | 0) % 22 + 3, py + (h * 33 | 0) % 22 + 3, 5, 3);
+      if (royal && x === 31) rc(c, 'rgba(0,0,0,.06)', px, py, T, T);
+      break;
+    case G.XWALL:
+      rc(c, '#cfcdc6', px, py, T, T);
+      rc(c, '#9a6b3a', px, py + 6, T, 22); rc(c, '#6b4320', px, py + 13, T, 2); rc(c, '#6b4320', px, py + 21, T, 2);
+      rc(c, '#a8322a', px, py + 2, 4, 28); rc(c, '#a8322a', px + T - 4, py + 2, 4, 28); rc(c, '#4c5c6e', px, py, T, 4);
+      break;
+    case G.WATER:
+      rc(c, '#3a86c8', px, py, T, T); rc(c, '#5aa3df', px + 4, py + 8, 10, 2); rc(c, '#5aa3df', px + 16, py + 22, 10, 2);
+      break;
+    case G.DIRT: case G.BEACON:
+      rc(c, '#bf9f6e', px, py, T, T);
+      if (h > .5) rc(c, '#ad8e5f', px + (h * 131 | 0) % 24 + 2, py + (h * 71 | 0) % 24 + 2, 4, 2);
+      if (h < .25) rc(c, '#cfb07c', px + (h * 233 | 0) % 24 + 3, py + (h * 47 | 0) % 24 + 3, 3, 2);
+      break;
+    case G.COURT: case G.HALL:
+      rc(c, '#cfcdc6', px, py, T, T); rc(c, '#b9b6ad', px, py, T, 1); rc(c, '#b9b6ad', px, py, 1, T);
+      if (h > .7) rc(c, '#c2c0b8', px + 6, py + 6, 6, 3);
+      break;
+    case G.FENCE:
+      rc(c, '#bf9f6e', px, py, T, T);
+      for (var i = 0; i < 4; i++) { rc(c, '#7a5230', px + 3 + i * 8, py + 4, 5, 26); rc(c, '#a07040', px + 3 + i * 8, py + 4, 5, 3); }
+      rc(c, '#5e3d20', px, py + 12, T, 3); rc(c, '#5e3d20', px, py + 22, T, 3);
+      break;
+    case G.BLD:
+      var below = isB(x, y + 1), above = isB(x, y - 1);
+      rc(c, '#4c5c6e', px, py, T, T);
+      for (var k = 0; k < T; k += 6) rc(c, '#3e4c5c', px + k, py, 2, T);
+      if (!above) rc(c, '#6b7d92', px, py, T, 4);
+      if (!below) {
+        rc(c, '#2f3a47', px, py + 14, T, 5);
+        rc(c, '#e9dcc0', px, py + 19, T, 13);
+        rc(c, '#a8322a', px + 1, py + 19, 4, 13); rc(c, '#a8322a', px + 27, py + 19, 4, 13);
+        if (h > .45) { rc(c, '#7a4b2a', px + 9, py + 21, 14, 11); rc(c, '#5a361d', px + 15, py + 21, 2, 11); }
+      }
+      break;
+  }
+}
+function renderMap() {
+  var c = mapCv.getContext('2d');
+  for (var y = 0; y < MH; y++) for (var x = 0; x < MW; x++) drawTile(c, map[y][x], x, y);
+  for (var yy2 = 8; yy2 <= 11; yy2++) [28, 34].forEach(function (xx) {
+    var px = xx * T, py = yy2 * T; c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(px + 8, py + 24, 18, 4);
+    rc(c, '#8f8b80', px + 10, py + 8, 12, 18); rc(c, '#a9a59a', px + 10, py + 8, 12, 4); rc(c, '#76736a', px + 19, py + 12, 3, 14);
+  });
+  rc(c, '#e2dfd5', 30 * T, 12 * T - 3, 4, T + 6); rc(c, '#a9a59a', 30 * T + 3, 12 * T - 3, 2, T + 6);
+  rc(c, '#e2dfd5', 33 * T - 4, 12 * T - 3, 4, T + 6); rc(c, '#a9a59a', 33 * T - 5, 12 * T - 3, 2, T + 6);
+  // 구역 간판
+  ZONES.forEach(function (z) {
+    var cx = z.r[0] * T + 16, cy = z.r[1] * T - 6;
+    if (z.r[1] < 4) cy = (z.r[1] + 1) * T + 2;
+  });
+}
+renderMap();
+
+/* ---------- player ---------- */
+var P = { x: 31.5 * T, y: 20.5 * T, r: 0.28 * T, face: 'd', step: 0, moving: false };
+var beaconBoost = 0, shipP = 0, stamina = 100, tired = false, runToggle = false, anim = 0;
+var mode = 'title', near = null, race = null, curZone = -2;
+var keys = {};
+
+function solidAt(px, py) { var tx = Math.floor(px / T), ty = Math.floor(py / T); if (tx < 0 || ty < 0 || tx >= MW || ty >= MH) return true; return !!SOLID[map[ty][tx]] || !!blk[ty * MW + tx]; }
+function canStand(x, y) { var r = P.r; return !(solidAt(x - r, y - r) || solidAt(x + r, y - r) || solidAt(x - r, y + r) || solidAt(x + r, y + r)); }
+
+function update(dt) {
+  anim += dt; if (beaconBoost > 0) beaconBoost -= dt;
+  if (mode === 'zq') tickZQ(dt);
+  if (mode !== 'play') { P.moving = false; return; }
+  updateZombies(dt);
+  if (S.stamps.sugun && shipP < 1) shipP = Math.min(1, shipP + dt / 2.5);
+  var mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+  var my = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
+  var moving = !!(mx || my);
+  var wantRun = keys.shift || runToggle;
+  var running = false;
+  if (moving) {
+    var n = Math.hypot(mx, my); mx /= n; my /= n;
+    if (Math.abs(mx) > Math.abs(my)) P.face = mx > 0 ? 'r' : 'l'; else P.face = my > 0 ? 'd' : 'u';
+    running = wantRun && (race ? true : (!tired && stamina > 0));
+    var sp = (running ? (race ? 8.6 : 7.4) : 4.4) * T * dt;
+    var nx = P.x + mx * sp, ny = P.y + my * sp;
+    if (canStand(nx, P.y)) P.x = nx;
+    if (canStand(P.x, ny)) P.y = ny;
+    P.step += dt * (running ? 14 : 9);
+  }
+  P.moving = moving;
+  if (!race) {
+    if (running) stamina -= 26 * dt; else stamina += (moving ? 12 : 24) * dt;
+    stamina = Math.max(0, Math.min(100, stamina));
+    if (stamina <= 0) tired = true;
+    if (tired && stamina >= 30) tired = false;
+  } else stamina = 100;
+  $('sFill').style.width = stamina + '%'; $('sFill').className = tired || stamina < 25 ? 'low' : '';
+  $('hRun').textContent = race ? '🐎 말을 타고 질주 중!' : tired ? '😮‍💨 숨이 차요… 잠깐 걸어요' : running ? '💨 달리는 중!' : '👟 달리기 장착 (Shift)';
+
+  // 엽전·상자
+  COINS.forEach(function (c) {
+    if (S.got[c.i]) return;
+    if (Math.hypot((c.tx + .5) * T - P.x, (c.ty + .5) * T - P.y) < .7 * T) { S.got[c.i] = 1; S.coins++; sfx.coin(); hud(); save(); }
+  });
+  CHESTS.forEach(function (c, i) {
+    if (S.chests[i]) return;
+    if (Math.hypot((c.tx + .5) * T - P.x, (c.ty + .5) * T - P.y) < .9 * T) {
+      S.chests[i] = 1; var g = 3 + Math.floor(Math.random() * 4); S.coins += g; sfx.ok(); hud(); save(); toast('🎁 보물 상자 발견! 엽전 +' + g);
+    }
+  });
+  // 구역 안내
+  var z = zoneAt(Math.floor(P.x / T), Math.floor(P.y / T));
+  if (z !== curZone) { curZone = z; if (z >= 0) { var el = $('zone'); el.innerHTML = '📍 ' + ZONES[z].n + '<br><small>학습지 ' + ZONES[z].s + '</small>'; el.classList.add('show'); setTimeout(function () { el.classList.remove('show'); }, 2600); } }
+  if (!gateOpen && Math.hypot(44.5 * T - P.x, 11 * T - P.y) < 2.2 * T && anim - lockMsgT > 8) { lockMsgT = anim; toast('🔒 동문이 굳게 잠겨 있다. 궁궐 관청의 문제를 모두 풀면 열릴 것 같다.'); }
+  // 가까운 NPC
+  var best = null, bd = 1.8 * T;
+  ALL.forEach(function (a) { var d = Math.hypot(a.px - P.x, a.py - P.y); if (d < bd) { bd = d; best = a; } });
+  if (best !== near) {
+    near = best;
+    var pr = $('prompt');
+    if (near) { pr.textContent = near.type === 'sign' ? 'E · 안내판 보기' : 'E · 대화 — ' + near.label; pr.classList.remove('hide'); } else pr.classList.add('hide');
+  }
+  // 역참 달리기
+  if (race) {
+    race.t -= dt;
+    var tp = RACE_PTS[race.i];
+    if (Math.hypot((tp[0] + .5) * T - P.x, (tp[1] + .5) * T - P.y) < 1.0 * T) { race.i++; sfx.coin(); if (race.i >= RACE_PTS.length) { endRace(true); return; } }
+    if (race.t <= 0) { endRace(false); return; }
+    $('racehud').textContent = '🏁 ' + race.i + ' / ' + RACE_PTS.length + '  ·  ' + Math.max(0, race.t).toFixed(1) + '초';
+  }
+}
+
+/* ---------- drawing ---------- */
+var cv = $('cv'), ctx = cv.getContext('2d'), dpr = 1, sc = 1.5, vw = 0, vh = 0;
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var w = window.innerWidth, h = window.innerHeight;
+  cv.width = Math.floor(w * dpr); cv.height = Math.floor(h * dpr);
+  sc = Math.max(1.0, Math.min(2.3, w / (21 * T)));
+  vw = w / sc; vh = h / sc;
+}
+window.addEventListener('resize', resize); resize();
+
+function rrect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h); c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r); c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.closePath(); }
+function drawPerson(c, cx, cy, o) {
+  var fy = cy + 11 + (o.bob || 0), sw = o.swing || 0;
+  c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(cx, cy + 12, 9, 3.5, 0, 0, 7); c.fill();
+  rc(c, '#2a2a33', cx - 5, fy - 7 + (sw > 0 ? -1 : 0), 4, 7); rc(c, '#2a2a33', cx + 1, fy - 7 + (sw < 0 ? -1 : 0), 4, 7);
+  rc(c, o.robe, cx - 7, fy - 18, 14, 12); rc(c, 'rgba(0,0,0,.25)', cx - 7, fy - 12, 14, 2);
+  rc(c, o.robe, cx - 10, fy - 17, 3, 9); rc(c, o.robe, cx + 7, fy - 17, 3, 9);
+  rc(c, '#f3cfa6', cx - 10, fy - 9, 3, 3); rc(c, '#f3cfa6', cx + 7, fy - 9, 3, 3);
+  if (o.collar) rc(c, '#ffffff', cx - 3, fy - 18, 6, 3);
+  c.fillStyle = o.skin || '#f3cfa6'; c.beginPath(); c.arc(cx, fy - 23, 6.5, 0, 7); c.fill();
+  var hy = fy - 29;
+  switch (o.hat) {
+    case 'gat': c.fillStyle = '#1d1d22'; c.beginPath(); c.ellipse(cx, hy + 3, 11, 3.5, 0, 0, 7); c.fill(); rc(c, '#1d1d22', cx - 4, hy - 5, 8, 8); break;
+    case 'gwan': rc(c, '#1d1d22', cx - 6, hy - 3, 12, 7); rc(c, '#1d1d22', cx - 11, hy - 1, 5, 3); rc(c, '#1d1d22', cx + 6, hy - 1, 5, 3); break;
+    case 'helm': c.fillStyle = '#7b8594'; c.beginPath(); c.arc(cx, hy + 3, 7.5, Math.PI, 0); c.fill(); rc(c, '#5d6674', cx - 8, hy + 3, 16, 2); rc(c, '#b3382c', cx - 1, hy - 5, 2, 4); break;
+    case 'band': rc(c, '#f4f1e8', cx - 7, hy + 2, 14, 3); rc(c, '#1d1d22', cx - 6, hy - 2, 12, 4); break;
+    case 'crown': rc(c, '#f1b72c', cx - 6, hy - 6, 12, 10); rc(c, '#f1b72c', cx - 12, hy - 1, 6, 3); rc(c, '#f1b72c', cx + 6, hy - 1, 6, 3); rc(c, '#b3382c', cx - 1, hy - 5, 2, 6); break;
+    case 'bun': c.fillStyle = '#e6e6ea'; c.beginPath(); c.arc(cx, hy + 5, 7.2, Math.PI, 0); c.fill(); c.fillRect(cx - 7, hy + 4, 14, 3); c.beginPath(); c.arc(cx, hy - 1, 4.2, 0, 7); c.fill(); c.fillStyle = '#b3382c'; c.fillRect(cx - 3, hy + 1, 6, 1.5); break;
+    case 'horn': rc(c, '#2f6e47', cx - 6, hy + 2, 12, 3); c.fillStyle = '#f1e7b0'; c.beginPath(); c.moveTo(cx - 5, hy + 3); c.lineTo(cx - 3, hy - 6); c.lineTo(cx - 1, hy + 3); c.fill(); c.beginPath(); c.moveTo(cx + 1, hy + 3); c.lineTo(cx + 3, hy - 6); c.lineTo(cx + 5, hy + 3); c.fill(); break;
+    default: rc(c, '#1d1d22', cx - 7, hy + 1, 14, 5); rc(c, '#1d1d22', cx - 7, hy + 4, 3, 4);
+  }
+  if (o.face !== 'u') {
+    var ex = o.face === 'l' ? -1.5 : o.face === 'r' ? 1.5 : 0;
+    rc(c, '#222', cx - 3 + ex, fy - 24, 2, 3); rc(c, '#222', cx + 1 + ex, fy - 24, 2, 3);
+  }
+  if (o.pack) rc(c, '#8a5a2a', cx - 9, fy - 20, 18, 5);
+  if (o.cane) { rc(c, '#6b4a2a', cx + 12, fy - 15, 2, 21); rc(c, '#6b4a2a', cx + 9, fy - 16, 6, 2); }
+}
+function drawLabel(c, x, y, text, col) {
+  c.font = '700 11px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  var w = c.measureText(text).width + 10;
+  c.fillStyle = col || 'rgba(20,24,36,.82)'; rrect(c, x - w / 2, y - 8, w, 16, 7); c.fill();
+  c.fillStyle = '#fff'; c.fillText(text, x, y);
+}
+var allDone = function () { var n = 0; for (var k in S.stamps) n++; return n >= TOTAL; };
+
+function draw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.imageSmoothingEnabled = false;
+  var camX = Math.max(0, Math.min(MW * T - vw, P.x - vw / 2)), camY = Math.max(0, Math.min(MH * T - vh, P.y - vh / 2));
+  if (MW * T < vw) camX = (MW * T - vw) / 2; if (MH * T < vh) camY = (MH * T - vh) / 2;
+  var k = sc * dpr;
+  ctx.setTransform(k, 0, 0, k, -camX * k, -camY * k);
+  ctx.drawImage(mapCv, 0, 0);
+  var x0 = Math.max(0, Math.floor(camX / T)), x1 = Math.min(MW - 1, Math.ceil((camX + vw) / T));
+  var y0 = Math.max(0, Math.floor(camY / T)), y1 = Math.min(MH - 1, Math.ceil((camY + vh) / T));
+  // 물결
+  for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) if (map[y][x] === G.WATER) {
+    var o = Math.sin(anim * 2 + x + y) * 3;
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(x * T + 8 + o, y * T + 14, 8, 2); ctx.fillRect(x * T + 18 - o, y * T + 26, 7, 2);
+  }
+  // 달리기 체크포인트
+  if (race) {
+    for (var i = race.i; i < RACE_PTS.length; i++) {
+      var p = RACE_PTS[i], cx = (p[0] + .5) * T, cy = (p[1] + .5) * T, isN = i === race.i;
+      ctx.strokeStyle = isN ? '#ffdf4a' : 'rgba(255,255,255,.6)'; ctx.lineWidth = isN ? 4 : 2;
+      ctx.beginPath(); ctx.arc(cx, cy, 14 + Math.sin(anim * 6) * (isN ? 3 : 0), 0, 7); ctx.stroke();
+      ctx.fillStyle = isN ? '#ffdf4a' : 'rgba(255,255,255,.7)'; ctx.font = '900 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(i + 1), cx, cy);
+    }
+    var tp = RACE_PTS[Math.min(race.i, RACE_PTS.length - 1)], ang = Math.atan2((tp[1] + .5) * T - P.y, (tp[0] + .5) * T - P.x);
+    ctx.save(); ctx.translate(P.x + Math.cos(ang) * 30, P.y + Math.sin(ang) * 30); ctx.rotate(ang);
+    ctx.fillStyle = '#ffdf4a'; ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(-5, -6); ctx.lineTo(-5, 6); ctx.fill(); ctx.restore();
+  }
+  // 엽전
+  COINS.forEach(function (c) {
+    if (S.got[c.i]) return;
+    var cx = (c.tx + .5) * T, cy = (c.ty + .5) * T + Math.sin(anim * 3 + c.i) * 2, w = Math.abs(Math.cos(anim * 3 + c.i)) * 6 + 2;
+    ctx.fillStyle = '#e6a416'; ctx.beginPath(); ctx.ellipse(cx, cy, w, 6, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#7a5410'; ctx.fillRect(cx - 1.2, cy - 1.2, 2.4, 2.4);
+  });
+  // 개체
+  var ents = [];
+  ALL.forEach(function (a) { ents.push({ y: a.py, d: function () { drawNpc(a); } }); });
+  CHESTS.forEach(function (c, i) { ents.push({ y: (c.ty + .5) * T, d: function () { drawChest(c, i); } }); });
+  ents.push({ y: 32 * T, d: drawBeacon });
+  ents.push({ y: 38 * T, d: drawSeonggyun });
+  ents.push({ y: 15 * T, d: drawGwanghwamun }); ents.push({ y: 7 * T, d: drawGeunjeongjeon });
+  ents.push({ y: 8 * T, d: drawGyeonghoeru }); ents.push({ y: 8 * T, d: drawHyangwonjeong });
+  ents.push({ y: 37 * T, d: drawHyanggyo });
+  ents.push({ y: 29 * T, d: drawExamInterior }); ents.push({ y: 9 * T, d: drawBond }); ents.push({ y: 13 * T, d: drawSamsaHall }); ents.push({ y: 33 * T, d: drawExamGate });
+  if (shipP > 0) ents.push({ y: 43 * T, d: drawShip });
+  if (zOn()) ZOMB.forEach(function (z) { ents.push({ y: z.y, d: function () { drawZombie(z); } }); });
+  ents.push({ y: P.y, d: drawPlayer });
+  ents.sort(function (a, b) { return a.y - b.y; });
+  ents.forEach(function (e) { e.d(); });
+  drawGateLabel(); drawSamsaLink(); drawZFX();
+  if (zOn()) drawNight(camX, camY, k);
+}
+function drawBeacon() {
+  var c = ctx, x0 = 21 * T, y0 = 29 * T, boost = beaconBoost > 0, i, j;
+  c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(x0 + 52, y0 + 96, 54, 8, 0, 0, 7); c.fill();
+  // 탑 몸체 (아래가 넓은 돌탑)
+  c.fillStyle = '#9a9486'; c.beginPath(); c.moveTo(x0 + 2, y0 + 96); c.lineTo(x0 + 94, y0 + 96); c.lineTo(x0 + 82, y0 - 8); c.lineTo(x0 + 14, y0 - 8); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(0,0,0,.14)'; c.beginPath(); c.moveTo(x0 + 2, y0 + 96); c.lineTo(x0 + 22, y0 + 96); c.lineTo(x0 + 20, y0 - 8); c.lineTo(x0 + 14, y0 - 8); c.closePath(); c.fill();
+  c.strokeStyle = '#7e786b'; c.lineWidth = 2;
+  for (i = 0; i < 9; i++) {
+    var yy = y0 - 8 + i * 11.5, inset = 12 - (yy - (y0 - 8)) / 104 * 10;
+    c.beginPath(); c.moveTo(x0 + inset + 2, yy); c.lineTo(x0 + 96 - inset - 2, yy); c.stroke();
+    for (j = 0; j < 5; j++) { var vx = x0 + inset + 8 + j * ((96 - 2 * inset - 16) / 4) + (i % 2 ? 7 : 0); c.beginPath(); c.moveTo(vx, yy); c.lineTo(vx, yy + 11.5); c.stroke(); }
+  }
+  // 문
+  c.fillStyle = '#3a2a1c'; c.fillRect(x0 + 40, y0 + 68, 16, 28); c.beginPath(); c.arc(x0 + 48, y0 + 68, 8, Math.PI, 0); c.fill();
+  // 윗 평대
+  c.fillStyle = '#b5ae9d'; c.fillRect(x0 + 8, y0 - 18, 80, 11); c.fillStyle = '#8c8678'; c.fillRect(x0 + 8, y0 - 9, 80, 3);
+  // 연기 구멍 5개 (연대)
+  for (i = 0; i < 5; i++) {
+    var cx = x0 + 22 + i * 13, lit = boost || i === 2;
+    c.fillStyle = '#8c8678'; c.fillRect(cx - 5, y0 - 34, 10, 17); c.fillStyle = '#b5ae9d'; c.fillRect(cx - 5, y0 - 34, 10, 3);
+    c.fillStyle = '#2b2b2b'; c.beginPath(); c.ellipse(cx, y0 - 33, 3.5, 1.6, 0, 0, 7); c.fill();
+    if (!lit) continue;
+    var fl = Math.sin(anim * 9 + i * 1.7), big = boost ? 1.7 : 1;
+    c.fillStyle = '#ff8a1f'; c.beginPath(); c.ellipse(cx, y0 - 37 - 3 * big, 4.5, (7 + 2.5 * fl) * big, 0, 0, 7); c.fill();
+    c.fillStyle = '#ffd84a'; c.beginPath(); c.ellipse(cx, y0 - 36 - 2 * big, 2.4, (4 + 1.5 * fl) * big, 0, 0, 7); c.fill();
+    // 연기
+    for (j = 0; j < 5; j++) {
+      var t = (anim * (boost ? .45 : .3) + j * .2 + i * .11) % 1;
+      c.globalAlpha = (1 - t) * (boost ? .75 : .55); c.fillStyle = boost ? '#d9d9d9' : '#e4e4e4';
+      c.beginPath(); c.arc(cx + Math.sin(t * 6 + i) * 4 + t * 14, y0 - 44 - t * (boost ? 90 : 62), 4 + t * (boost ? 11 : 8), 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+  drawLabel(c, x0 + 48, y0 + 30, boost ? '🔥 봉수대 (신호 중!)' : '봉수대', boost ? 'rgba(179,56,44,.92)' : null);
+}
+function drawHall(c, x, y, w, h, rh, tiers, dan, roofCol) {
+  var i, j, by = y + h, roof = roofCol || '#4c5c6e';
+  c.fillStyle = '#b9b3a4'; c.fillRect(x - 6, by - 5, w + 12, 8); c.fillStyle = '#9d978a'; c.fillRect(x - 6, by + 3, w + 12, 2);
+  c.fillStyle = '#efe3c8'; c.fillRect(x, y + rh, w, h - rh - 4);
+  var n = Math.max(3, Math.round(w / 18)), step = w / n;
+  for (i = 0; i < n; i++) { c.fillStyle = '#7a4b2a'; c.fillRect(x + i * step + 4, y + rh + 4, step - 8, h - rh - 10); c.fillStyle = '#5a361d'; c.fillRect(x + i * step + step / 2 - 1, y + rh + 4, 2, h - rh - 10); }
+  for (i = 0; i <= n; i++) { c.fillStyle = '#a8322a'; c.fillRect(x + i * step - 2, y + rh, 4, h - rh - 4); }
+  function rf(ox, oy, ow, orh) {
+    c.fillStyle = roof; c.beginPath(); c.moveTo(ox + 10, oy); c.lineTo(ox + ow - 10, oy); c.lineTo(ox + ow + 14, oy + orh); c.lineTo(ox - 14, oy + orh); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.22)'; c.lineWidth = 1.5;
+    for (j = 0; j <= 12; j++) { var t = j / 12; c.beginPath(); c.moveTo(ox + 10 + (ow - 20) * t, oy); c.lineTo(ox - 14 + (ow + 28) * t, oy + orh); c.stroke(); }
+    c.fillStyle = '#2f3a47'; c.fillRect(ox - 14, oy + orh - 1, ow + 28, 4);
+    c.beginPath(); c.moveTo(ox - 14, oy + orh + 3); c.lineTo(ox - 21, oy + orh - 5); c.lineTo(ox - 6, oy + orh + 3); c.fill();
+    c.beginPath(); c.moveTo(ox + ow + 14, oy + orh + 3); c.lineTo(ox + ow + 21, oy + orh - 5); c.lineTo(ox + ow + 6, oy + orh + 3); c.fill();
+    c.fillStyle = '#1f2a36'; c.fillRect(ox + 6, oy - 3, ow - 12, 5); c.fillRect(ox + 4, oy - 7, 5, 9); c.fillRect(ox + ow - 9, oy - 7, 5, 9);
+  }
+  if (tiers === 2) rf(x + w * .16, y - 14, w * .68, 15);
+  rf(x, y + 2, w, rh - 2);
+  if (dan) for (var k = 0; k * 8 < w; k++) { c.fillStyle = ['#2f8f6a', '#2f5fa8', '#c0392b', '#f1b72c'][k % 4]; c.fillRect(x + k * 8, y + rh + 3, Math.min(7, w - k * 8), 5); }
+}
+function drawGinkgo(c, x, y, k) {
+  c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(x, y + 2, 20, 5, 0, 0, 7); c.fill();
+  c.fillStyle = '#6b4a2a'; c.fillRect(x - 3, y - 22, 6, 24);
+  c.fillStyle = '#e0aa1c'; c.beginPath(); c.arc(x, y - 32, 22, 0, 7); c.fill();
+  c.fillStyle = '#efc83a'; c.beginPath(); c.arc(x - 8, y - 38, 12, 0, 7); c.fill(); c.beginPath(); c.arc(x + 9, y - 28, 10, 0, 7); c.fill();
+  c.fillStyle = '#f6dd6a'; c.beginPath(); c.arc(x - 3, y - 42, 5, 0, 7); c.fill();
+  for (var i = 0; i < 3; i++) { var t = (anim * .25 + i * .33 + k * .17) % 1; c.globalAlpha = 1 - t * .6; c.fillStyle = '#f0c630'; c.beginPath(); c.ellipse(x - 14 + i * 14 + Math.sin(t * 8 + i) * 6, y - 12 + t * 16, 2.6, 1.8, t * 6, 0, 7); c.fill(); }
+  c.globalAlpha = 1;
+}
+function drawGwanghwamun() {
+  var c = ctx, X = 27 * T, Y = 15 * T, i;
+  c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(X - 4, Y + 94, 296, 6);
+  c.fillStyle = '#aca79b'; c.fillRect(X, Y + 44, 288, 52);
+  c.fillStyle = '#c4bfb3'; c.fillRect(X, Y + 44, 288, 4);
+  c.strokeStyle = '#8f8a7e'; c.lineWidth = 1.5;
+  for (i = 0; i < 5; i++) { c.beginPath(); c.moveTo(X, Y + 58 + i * 9); c.lineTo(X + 288, Y + 58 + i * 9); c.stroke(); }
+  for (i = 0; i < 24; i++) { c.beginPath(); c.moveTo(X + 6 + i * 12, Y + 48 + (i % 2) * 9); c.lineTo(X + 6 + i * 12, Y + 57 + (i % 2) * 9); c.stroke(); }
+  [[32, 48], [208, 48]].forEach(function (a) { c.fillStyle = '#2a241c'; c.fillRect(X + a[0], Y + 66, a[1], 30); c.beginPath(); c.arc(X + a[0] + a[1] / 2, Y + 66, a[1] / 2, Math.PI, 0); c.fill(); c.fillStyle = '#5a361d'; c.fillRect(X + a[0] + 6, Y + 70, a[1] - 12, 26); });
+  c.fillStyle = '#2a241c'; c.fillRect(X + 96, Y + 62, 96, 34); c.beginPath(); c.arc(X + 144, Y + 62, 48, Math.PI, 0); c.fill();
+  drawHall(c, X + 20, Y - 2, 248, 46, 22, 2, true, '#44546a');
+  c.fillStyle = '#1d1d22'; c.fillRect(X + 120, Y + 24, 48, 13); c.fillStyle = '#f1d37a'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('光化門', X + 144, Y + 31);
+  drawLabel(c, X + 144, Y - 26, '광화문', 'rgba(30,60,120,.92)');
+}
+function drawGeunjeongjeon() {
+  var c = ctx, X = 26 * T, i;
+  c.fillStyle = '#bdb8ac'; c.fillRect(X, 192, 352, 32); c.fillStyle = '#d3cfc3'; c.fillRect(X, 192, 352, 4);
+  c.fillStyle = '#cbc7bb'; c.fillRect(X + 16, 170, 320, 24); c.fillStyle = '#ddd9cd'; c.fillRect(X + 16, 170, 320, 4);
+  for (i = 0; i < 28; i++) { c.fillStyle = '#e6e3d9'; c.fillRect(X + 18 + i * 11.4, 164, 5, 8); }
+  for (i = 0; i < 29; i++) { c.fillStyle = '#e6e3d9'; c.fillRect(X + 2 + i * 12, 186, 5, 8); }
+  [[60, 50], [242, 50]].forEach(function (a) { for (var j = 0; j < 5; j++) { c.fillStyle = j % 2 ? '#a9a59a' : '#c4c0b4'; c.fillRect(X + a[0], 194 + j * 6, a[1], 6); } });
+  c.fillStyle = '#d6d2c6'; c.fillRect(X + 144, 194, 64, 30); c.fillStyle = '#b4b1a6'; c.fillRect(X + 170, 194, 12, 30);
+  for (i = 0; i < 4; i++) { c.fillStyle = '#c4c0b4'; c.fillRect(X + 132, 196 + i * 7, 12, 3); c.fillRect(X + 208, 196 + i * 7, 12, 3); }
+  [[8, 184], [336, 184], [8, 160], [336, 160]].forEach(function (a) { c.fillStyle = '#8f8b80'; c.beginPath(); c.arc(X + a[0], a[1], 5, 0, 7); c.fill(); c.fillStyle = '#a9a59a'; c.fillRect(X + a[0] - 3, a[1] + 3, 6, 5); });
+  drawHall(c, X + 30, 96, 292, 76, 42, 2, true, '#44546a');
+  c.fillStyle = '#1d1d22'; c.fillRect(X + 152, 146, 48, 13); c.fillStyle = '#f1d37a'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('勤政殿', X + 176, 153);
+  drawLabel(c, X + 176, 74, '근정전', 'rgba(30,60,120,.92)');
+}
+function drawGyeonghoeru() {
+  var c = ctx, X = 19 * T, Y = 3 * T, i;
+  c.fillStyle = 'rgba(0,0,0,.2)'; c.beginPath(); c.ellipse(X + 96, Y + 138, 88, 10, 0, 0, 7); c.fill();
+  for (i = 0; i < 12; i++) { c.fillStyle = '#d4cfc2'; c.fillRect(X + 22 + i * 12.4, Y + 106, 7, 30); c.fillStyle = '#a9a59a'; c.fillRect(X + 26 + i * 12.4, Y + 106, 3, 30); c.fillStyle = 'rgba(255,255,255,.25)'; c.fillRect(X + 22 + i * 12.4, Y + 138, 7, 8); }
+  c.fillStyle = '#9a6b3a'; c.fillRect(X + 14, Y + 100, 168, 8); c.fillStyle = '#6b4320'; c.fillRect(X + 14, Y + 108, 168, 3);
+  drawHall(c, X + 20, Y + 12, 156, 90, 44, 2, true, '#44546a');
+  c.fillStyle = '#a8322a'; for (i = 0; i < 14; i++) c.fillRect(X + 22 + i * 11.4, Y + 84, 3, 16);
+  drawLabel(c, X + 98, Y - 2, '경회루', 'rgba(30,60,120,.92)');
+}
+function drawHyangwonjeong() {
+  var c = ctx, cx = 41.5 * T, Y = 3 * T, i;
+  c.fillStyle = '#b9b6ad'; c.beginPath(); c.ellipse(cx, Y + 106, 44, 17, 0, 0, 7); c.fill();
+  c.fillStyle = '#d3cfc3'; c.beginPath(); c.ellipse(cx, Y + 100, 44, 16, 0, 0, 7); c.fill();
+  c.fillStyle = '#9a6b3a'; for (i = 0; i < 6; i++) c.fillRect(cx + 40 + i * 5, Y + 96 + i * 2, 5, 6);
+  c.fillStyle = '#e6d6b6'; c.fillRect(cx - 24, Y + 66, 48, 30);
+  for (i = 0; i < 4; i++) { c.fillStyle = '#a8322a'; c.fillRect(cx - 26 + i * 16, Y + 62, 5, 38); }
+  c.fillStyle = '#7a4b2a'; c.fillRect(cx - 16, Y + 74, 32, 22);
+  c.fillStyle = '#2f8f6a'; c.fillRect(cx - 34, Y + 56, 68, 5); c.fillStyle = '#c0392b'; c.fillRect(cx - 30, Y + 61, 60, 3);
+  c.fillStyle = '#44546a'; c.beginPath(); c.moveTo(cx, Y + 6); c.quadraticCurveTo(cx - 12, Y + 40, cx - 50, Y + 56); c.lineTo(cx + 50, Y + 56); c.quadraticCurveTo(cx + 12, Y + 40, cx, Y + 6); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 1.5; for (i = -3; i <= 3; i++) { c.beginPath(); c.moveTo(cx + i * 2, Y + 14); c.lineTo(cx + i * 15, Y + 55); c.stroke(); }
+  c.fillStyle = '#f1b72c'; c.fillRect(cx - 2, Y, 4, 10); c.beginPath(); c.arc(cx, Y, 4, 0, 7); c.fill();
+  drawLabel(c, cx, Y - 8, '향원정', 'rgba(30,60,120,.92)');
+}
+var SAMSA = ['saheonbu', 'sagan', 'hongmun'], samsaT0 = -99;
+function drawSamsaHall() {
+  var c = ctx, X = 37 * T, Y = 13 * T, on = !!S.samsa;
+  drawHall(c, X + 6, Y - 10, 212, 70, 34, 1, true, on ? '#44546a' : '#59616e');
+  c.fillStyle = on ? '#1d1d22' : '#3a3d44'; c.fillRect(X + 88, Y + 32, 48, 13);
+  c.fillStyle = on ? '#f1d37a' : '#8c8f96'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('三司', X + 112, Y + 39);
+  if (on) { c.fillStyle = 'rgba(255,223,74,' + (.25 + .15 * Math.sin(anim * 4)) + ')'; c.fillRect(X, Y - 12, 224, 76); }
+  drawLabel(c, X + 112, Y - 28, on ? '✨ 3사 (언론 기관)' : '3사 청사 · 세 관청을 모두 만나 보세요', on ? 'rgba(160,110,10,.95)' : 'rgba(70,70,80,.9)');
+}
+function drawSamsaLink() {
+  if (!S.samsa) return;
+  var c = ctx, pts = SAMSA.map(function (id) { var a = ALL.filter(function (n) { return n.id === id; })[0]; return [a.px, a.py - 50]; }), i, k;
+  c.strokeStyle = '#ffdf4a'; c.lineWidth = 3;
+  for (i = 0; i < 2; i++) { var a = pts[i], b = pts[i + 1]; c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo((a[0] + b[0]) / 2, a[1] + 14, b[0], b[1]); c.stroke(); }
+  for (i = 0; i < 2; i++) { var a2 = pts[i], b2 = pts[i + 1], t = (anim * .6 + i * .5) % 1; var qx = (1 - t) * (1 - t) * a2[0] + 2 * (1 - t) * t * ((a2[0] + b2[0]) / 2) + t * t * b2[0], qy = (1 - t) * (1 - t) * a2[1] + 2 * (1 - t) * t * (a2[1] + 14) + t * t * b2[1]; c.fillStyle = '#fff6b0'; c.beginPath(); c.arc(qx, qy, 3.5, 0, 7); c.fill(); }
+  pts.forEach(function (p) { c.fillStyle = '#ffdf4a'; c.beginPath(); c.arc(p[0], p[1], 5, 0, 7); c.fill(); c.strokeStyle = '#7a5410'; c.lineWidth = 1.5; c.stroke(); });
+  var d = anim - samsaT0;
+  if (d >= 0 && d < 2.6) pts.forEach(function (p) { for (k = 0; k < 2; k++) { var rr = ((d * .9 + k * .5) % 1); c.globalAlpha = (1 - rr) * (1 - d / 2.6); c.strokeStyle = '#ffdf4a'; c.lineWidth = 3; c.beginPath(); c.arc(p[0], p[1] + 38, 14 + rr * 44, 0, 7); c.stroke(); } c.globalAlpha = 1; });
+}
+function drawHyanggyo() {
+  var c = ctx, X = 47 * T, Y = 35 * T;
+  c.fillStyle = '#cfcdc6'; c.fillRect(X, Y, 96, 64);
+  drawHall(c, X + 4, Y - 4, 88, 62, 34, 1);
+  c.fillStyle = '#a8322a'; c.fillRect(X + 2, Y + 36, 4, 28); c.fillRect(X + 90, Y + 36, 4, 28);
+  drawLabel(c, X + 48, Y - 16, '향교', 'rgba(30,60,120,.92)');
+}
+function drawBond() {
+  var c = ctx, a = ALL.filter(function (n) { return n.id === 'suryeong'; })[0], b = ALL.filter(function (n) { return n.id === 'hyangri'; })[0], on = !!S.bond;
+  var dx = 57 * T, dy = 9 * T, i;
+  c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(dx + 2, dy + 28, 28, 4);
+  c.fillStyle = '#8a5a2a'; c.fillRect(dx + 2, dy + 14, 28, 10); c.fillStyle = '#6b4320'; c.fillRect(dx + 2, dy + 24, 28, 3); c.fillRect(dx + 4, dy + 27, 3, 5); c.fillRect(dx + 25, dy + 27, 3, 5);
+  c.fillStyle = '#fffdf5'; c.fillRect(dx + 6, dy + 8, 12, 8); c.fillStyle = '#e6d6b6'; c.fillRect(dx + 8, dy + 6, 12, 8); c.fillStyle = '#8a8a8a'; c.fillRect(dx + 10, dy + 9, 8, 1);
+  c.fillStyle = '#d83a2a'; c.fillRect(dx + 21, dy + 9, 3, 6);
+  if (!on) { drawLabel(c, dx + 16, dy - 42, '동헌 · 두 사람을 모두 만나 보세요', 'rgba(70,70,80,.9)'); return; }
+  var p0 = [a.px, a.py - 50], p1 = [b.px, b.py - 50], mx = (p0[0] + p1[0]) / 2, my = p0[1] + 16;
+  c.strokeStyle = '#ffdf4a'; c.lineWidth = 3; c.beginPath(); c.moveTo(p0[0], p0[1]); c.quadraticCurveTo(mx, my, p1[0], p1[1]); c.stroke();
+  [p0, p1].forEach(function (p) { c.fillStyle = '#ffdf4a'; c.beginPath(); c.arc(p[0], p[1], 5, 0, 7); c.fill(); c.strokeStyle = '#7a5410'; c.lineWidth = 1.5; c.stroke(); });
+  var ph = (anim * .45) % 2, t = ph < 1 ? ph : 2 - ph, sx = (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * mx + t * t * p1[0], sy = (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * my + t * t * p1[1];
+  c.fillStyle = '#f5ecd2'; c.fillRect(sx - 7, sy - 4, 14, 8); c.strokeStyle = '#8a6a2f'; c.lineWidth = 1.5; c.strokeRect(sx - 7, sy - 4, 14, 8); c.fillStyle = '#d83a2a'; c.fillRect(sx - 1, sy - 4, 2, 8);
+  c.fillStyle = ph < 1 ? '#3b6fa8' : '#8a2f2f'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(ph < 1 ? '명령 →' : '← 보고', sx, sy - 14);
+  var d = anim - bondT0; if (d >= 0 && d < 2.6) [a, b].forEach(function (n) { for (i = 0; i < 2; i++) { var rr = ((d * .9 + i * .5) % 1); c.globalAlpha = (1 - rr) * (1 - d / 2.6); c.strokeStyle = '#ffdf4a'; c.lineWidth = 3; c.beginPath(); c.arc(n.px, n.py + 10, 14 + rr * 40, 0, 7); c.stroke(); } c.globalAlpha = 1; });
+  drawLabel(c, dx + 16, dy - 42, '🤝 수령 ↔ 향리 (서로 돕는 관계)', 'rgba(160,110,10,.95)');
+}
+var bondT0 = -99;
+function drawExamInterior() {
+  var c = ctx, i;
+  [[39.5, '文科', '#2f4a8a'], [43.5, '武科', '#8a2f2f'], [47.5, '雜科', '#3d6b4a']].forEach(function (p) {
+    var cx = p[0] * T, cy = 27 * T + 16; c.fillStyle = p[2]; rrect(c, cx - 21, cy - 11, 42, 22, 4); c.fill();
+    c.strokeStyle = '#f1b72c'; c.lineWidth = 2; rrect(c, cx - 21, cy - 11, 42, 22, 4); c.stroke();
+    c.fillStyle = '#fff'; c.font = '900 14px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(p[1], cx, cy + 1);
+  });
+  function desk(tx, kind) {
+    var x = tx * T, y = 28 * T;
+    c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(x + 3, y + 28, 26, 4);
+    c.fillStyle = '#8a5a2a'; c.fillRect(x + 3, y + 14, 26, 9); c.fillStyle = '#6b4320'; c.fillRect(x + 3, y + 23, 26, 3); c.fillRect(x + 5, y + 26, 3, 5); c.fillRect(x + 24, y + 26, 3, 5);
+    if (kind === 'write') { c.fillStyle = '#fffdf5'; c.fillRect(x + 7, y + 9, 13, 8); c.fillStyle = '#8a8a8a'; c.fillRect(x + 9, y + 11, 8, 1); c.fillRect(x + 9, y + 13, 6, 1); c.fillStyle = '#222'; c.fillRect(x + 23, y + 7, 2, 10); c.fillStyle = '#111'; c.fillRect(x + 21, y + 15, 6, 3); }
+    else { var cs = ['#3b6fa8', '#b3382c', '#3d6b4a']; for (var k = 0; k < 3; k++) { c.fillStyle = cs[k]; c.fillRect(x + 6 + k * 2, y + 12 - k * 3, 16, 3); } c.fillStyle = '#fffdf5'; c.fillRect(x + 22, y + 9, 6, 7); }
+  }
+  [37, 39, 41].forEach(function (t) { desk(t, 'write'); }); desk(46, 'book');
+  var cb = 48 * T, cy2 = 28 * T;
+  c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(cb + 3, cy2 + 29, 26, 3);
+  c.fillStyle = '#7a4b2a'; c.fillRect(cb + 3, cy2 + 2, 26, 28); c.fillStyle = '#5a361d'; c.fillRect(cb + 3, cy2 + 2, 26, 3);
+  for (i = 0; i < 3; i++) for (var j = 0; j < 3; j++) { c.fillStyle = '#9a6b3a'; c.fillRect(cb + 5 + j * 8, cy2 + 7 + i * 7, 7, 6); c.fillStyle = '#f1b72c'; c.fillRect(cb + 8 + j * 8, cy2 + 9 + i * 7, 2, 2); }
+  [42, 44].forEach(function (t) {
+    var x = t * T, y = 28 * T;
+    c.fillStyle = '#d8b44a'; c.fillRect(x + 5, y + 26, 22, 6); c.fillStyle = '#b8942e'; c.fillRect(x + 5, y + 30, 22, 2);
+    c.fillStyle = '#6b4a2a'; c.fillRect(x + 14, y + 16, 4, 12);
+    c.fillStyle = '#f5ecd2'; c.beginPath(); c.arc(x + 16, y + 6, 14, 0, 7); c.fill();
+    c.fillStyle = '#3b6fa8'; c.beginPath(); c.arc(x + 16, y + 6, 10, 0, 7); c.fill();
+    c.fillStyle = '#f5ecd2'; c.beginPath(); c.arc(x + 16, y + 6, 7, 0, 7); c.fill();
+    c.fillStyle = '#c0392b'; c.beginPath(); c.arc(x + 16, y + 6, 4, 0, 7); c.fill();
+    c.strokeStyle = '#333'; c.lineWidth = 1.5; c.beginPath(); c.arc(x + 16, y + 6, 14, 0, 7); c.stroke();
+  });
+}
+function drawExamGate() {
+  var c = ctx, GX = 42 * T, GY = 33 * T;
+  c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(GX - 6, GY + 30, 3 * T + 12, 4);
+  c.fillStyle = '#a8322a'; c.fillRect(GX - 6, GY - 8, 8, 42); c.fillRect(GX + 3 * T - 2, GY - 8, 8, 42);
+  c.fillStyle = '#8a2820'; c.fillRect(GX - 10, GY - 10, 3 * T + 20, 8);
+  c.fillStyle = '#44546a'; c.beginPath(); c.moveTo(GX - 20, GY - 10); c.lineTo(GX + 3 * T + 20, GY - 10); c.lineTo(GX + 3 * T + 8, GY - 28); c.lineTo(GX - 8, GY - 28); c.closePath(); c.fill();
+  c.fillStyle = '#2f3a47'; c.fillRect(GX - 20, GY - 12, 3 * T + 40, 4); c.fillStyle = '#1f2a36'; c.fillRect(GX - 4, GY - 31, 3 * T + 8, 4);
+  c.fillStyle = '#1d1d22'; c.fillRect(GX + 26, GY - 2, 44, 12); c.fillStyle = '#f1d37a'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('科擧場', GX + 48, GY + 4);
+  drawLabel(c, GX + 48, GY - 40, '과거 시험장', 'rgba(30,60,120,.92)');
+}
+function drawSeonggyun() {
+  var c = ctx, X = 52 * T, Y = 33 * T, i;
+  c.fillStyle = '#c8c4b8'; c.fillRect(X, Y, 288, 160);
+  c.strokeStyle = '#b3afa3'; c.lineWidth = 1;
+  for (i = 24; i < 288; i += 24) { c.beginPath(); c.moveTo(X + i, Y + 8); c.lineTo(X + i, Y + 152); c.stroke(); }
+  for (i = 24; i < 160; i += 24) { c.beginPath(); c.moveTo(X + 8, Y + i); c.lineTo(X + 280, Y + i); c.stroke(); }
+  c.fillStyle = '#a39a8b'; c.fillRect(X, Y, 288, 9); c.fillRect(X, Y, 8, 160); c.fillRect(X + 280, Y, 8, 160);
+  c.fillStyle = '#c9c0b0'; c.fillRect(X, Y, 288, 3); c.fillRect(X, Y, 3, 160); c.fillRect(X + 285, Y, 3, 160);
+  drawHall(c, X + 14, Y + 28, 52, 38, 20, 1);
+  drawHall(c, X + 222, Y + 28, 52, 38, 20, 1);
+  drawHall(c, X + 84, Y + 14, 120, 52, 26, 1);
+  drawHall(c, X + 72, Y + 98, 144, 52, 28, 2);
+  drawGinkgo(c, X + 46, Y + 92, 0); drawGinkgo(c, X + 242, Y + 92, 1);
+  c.fillStyle = '#a39a8b'; c.fillRect(X, Y + 152, 118, 8); c.fillRect(X + 170, Y + 152, 118, 8);
+  c.fillStyle = '#c9c0b0'; c.fillRect(X, Y + 152, 118, 3); c.fillRect(X + 170, Y + 152, 118, 3);
+  c.fillStyle = '#d9d3c2'; c.fillRect(X + 122, Y + 150, 44, 10);
+  c.fillStyle = '#b3382c'; c.fillRect(X + 118, Y + 120, 6, 40); c.fillRect(X + 164, Y + 120, 6, 40); c.fillRect(X + 114, Y + 118, 60, 7);
+  for (i = 0; i < 9; i++) { c.beginPath(); c.moveTo(X + 116 + i * 7, Y + 118); c.lineTo(X + 119.5 + i * 7, Y + 107); c.lineTo(X + 123 + i * 7, Y + 118); c.fill(); }
+  c.fillStyle = '#f1b72c'; c.fillRect(X + 118, Y + 130, 6, 2); c.fillRect(X + 164, Y + 130, 6, 2);
+  if (!S.stamps.sogwa && !S.stamps.seonggyun) {
+    c.fillStyle = '#7a4b2a'; c.fillRect(X + 110, Y + 130, 68, 5); c.fillRect(X + 110, Y + 142, 68, 5); c.fillRect(X + 112, Y + 126, 5, 26); c.fillRect(X + 171, Y + 126, 5, 26);
+    c.fillStyle = '#f1b72c'; c.fillRect(X + 138, Y + 134, 12, 10); c.fillStyle = '#7a5410'; c.fillRect(X + 142, Y + 137, 4, 4);
+    drawLabel(c, X + 144, Y - 9, '🔒 성균관 · 소과 합격자만 입학', 'rgba(110,40,40,.92)');
+  } else drawLabel(c, X + 144, Y - 9, '성균관', 'rgba(30,60,120,.92)');
+  drawLabel(c, X + 144, Y + 50, '명륜당 (강당)');
+  drawLabel(c, X + 144, Y + 132, '대성전 (공자 사당)');
+}
+function drawShip() {
+  var c = ctx, p = shipP, ease = 1 - Math.pow(1 - p, 3), a = Math.min(1, p * 2), i, j;
+  var x = 7 * T - (1 - ease) * 36, y = 41.1 * T + Math.sin(anim * 1.8) * 1.5;
+  c.save(); c.translate(x, y); var z = .75 + .25 * ease; c.scale(z, z); c.globalAlpha = a;
+  c.strokeStyle = '#ffffff'; c.lineWidth = 2;
+  for (i = 0; i < 2; i++) { var rr = (anim * .7 + i * .5) % 1; c.globalAlpha = a * (1 - rr) * .7; c.beginPath(); c.ellipse(2, 14, 56 + rr * 22, 9 + rr * 5, 0, 0, 7); c.stroke(); }
+  c.globalAlpha = a;
+  if (p < 1) { c.fillStyle = '#ffffff'; for (i = 0; i < 8; i++) { var an = i * .785, rd = ease * 46; c.globalAlpha = (1 - p) * .9; c.beginPath(); c.arc(Math.cos(an) * rd, 12 + Math.sin(an) * rd * .35, 3, 0, 7); c.fill(); } c.globalAlpha = a; }
+  // 노
+  c.strokeStyle = '#4a3018'; c.lineWidth = 2.5;
+  for (i = 0; i < 5; i++) { var ox = -34 + i * 17, sw = Math.sin(anim * 3 + i * .8) * 5; c.beginPath(); c.moveTo(ox, 9); c.lineTo(ox - 6 + sw, 24); c.stroke(); }
+  // 선체
+  c.fillStyle = '#5a3b1f'; c.beginPath(); c.moveTo(-52, 3); c.quadraticCurveTo(-48, 17, -30, 17); c.lineTo(36, 17); c.quadraticCurveTo(52, 15, 56, 3); c.closePath(); c.fill();
+  c.fillStyle = '#3e2a14'; c.fillRect(-50, 3, 104, 3);
+  for (i = 0; i < 4; i++) { var cx2 = -32 + i * 19; c.fillStyle = '#1d1208'; c.fillRect(cx2, 8, 8, 5); if (Math.floor(anim * .8) % 4 === i && (anim * .8) % 1 < .25) { c.fillStyle = '#ffb000'; c.fillRect(cx2 - 1, 9, 10, 3); } }
+  // 거북 등딱지 + 철침
+  c.fillStyle = '#6b7a5a'; c.beginPath(); c.moveTo(-46, 3); c.quadraticCurveTo(-34, -26, 0, -28); c.quadraticCurveTo(34, -26, 48, 3); c.closePath(); c.fill();
+  c.strokeStyle = '#4f5c42'; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(-40, -6); c.quadraticCurveTo(0, -20, 42, -6); c.stroke();
+  c.beginPath(); c.moveTo(-30, -16); c.quadraticCurveTo(0, -28, 32, -16); c.stroke();
+  for (j = -3; j <= 3; j++) { var vx = j * 13; c.beginPath(); c.moveTo(vx, -24 + Math.abs(j) * 3 + 6); c.lineTo(vx * 1.08, 2); c.stroke(); }
+  c.fillStyle = '#f0ece0';
+  for (j = -3; j <= 3; j++) { var sx = j * 12.5, sy = -27 + Math.pow(sx / 46, 2) * 29; c.beginPath(); c.moveTo(sx - 2.5, sy + 2); c.lineTo(sx, sy - 7); c.lineTo(sx + 2.5, sy + 2); c.fill(); }
+  // 깃발
+  c.fillStyle = '#3e2a14'; c.fillRect(-40, -52, 2, 28);
+  var wv = Math.sin(anim * 5) * 2; c.fillStyle = '#d83a2a'; c.beginPath(); c.moveTo(-38, -52); c.lineTo(-20, -49 + wv); c.lineTo(-38, -41); c.fill();
+  c.fillStyle = '#f1b72c'; c.beginPath(); c.arc(-33, -47, 2, 0, 7); c.fill();
+  // 용머리
+  c.fillStyle = '#b3382c'; c.beginPath(); c.moveTo(46, 3); c.lineTo(53, -10); c.lineTo(66, -13); c.lineTo(73, -6); c.lineTo(63, -2); c.lineTo(71, 3); c.lineTo(55, 7); c.closePath(); c.fill();
+  c.fillStyle = '#f1b72c'; c.beginPath(); c.arc(62, -8, 2, 0, 7); c.fill();
+  c.strokeStyle = '#f1b72c'; c.lineWidth = 2; c.beginPath(); c.moveTo(56, -11); c.lineTo(52, -19); c.stroke();
+  c.fillStyle = '#2b1010'; c.fillRect(64, -4, 6, 2);
+  for (j = 0; j < 4; j++) { var t = (anim * .5 + j * .25) % 1; c.globalAlpha = a * (1 - t) * .6; c.fillStyle = '#e0e0e0'; c.beginPath(); c.arc(74 + t * 30, -3 - t * 14, 3 + t * 7, 0, 7); c.fill(); }
+  c.restore();
+  if (p >= 1) drawLabel(c, x, y - 58, '🐢 거북선', 'rgba(190,120,20,.92)');
+}
+function drawChest(c, i) {
+  var x = c.tx * T, y = c.ty * T;
+  if (S.chests[i]) { rc(ctx, '#6b4a2a', x + 6, y + 14, 20, 12); rc(ctx, '#3a2614', x + 8, y + 16, 16, 6); return; }
+  rc(ctx, 'rgba(0,0,0,.25)', x + 5, y + 26, 22, 4);
+  rc(ctx, '#8a5a2a', x + 6, y + 12, 20, 14); rc(ctx, '#a8722f', x + 6, y + 12, 20, 6); rc(ctx, '#f1b72c', x + 14, y + 16, 4, 6); rc(ctx, '#f1b72c', x + 6, y + 18, 20, 2);
+  var s = Math.sin(anim * 4 + i) * 2; ctx.fillStyle = '#fff8c0'; ctx.fillRect(x + 22, y + 8 + s, 2, 2); ctx.fillRect(x + 8, y + 6 - s, 2, 2);
+}
+function drawSign(a) {
+  var c = ctx, x = a.px, y = a.py + 10;
+  c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(x, y + 6, 20, 5, 0, 0, 7); c.fill();
+  c.fillStyle = '#6b4a2a'; c.fillRect(x - 17, y - 22, 4, 28); c.fillRect(x + 13, y - 22, 4, 28);
+  c.fillStyle = '#5a361d'; c.fillRect(x - 22, y - 40, 44, 32); c.fillStyle = '#f5ecd2'; c.fillRect(x - 19, y - 37, 38, 26);
+  c.fillStyle = '#e8d9b0'; c.fillRect(x - 19, y - 37, 38, 3);
+  c.fillStyle = '#dfe5a8'; c.beginPath(); c.moveTo(x - 6, y - 32); c.lineTo(x + 6, y - 31); c.lineTo(x + 10, y - 22); c.lineTo(x + 2, y - 14); c.lineTo(x - 8, y - 18); c.closePath(); c.fill();
+  c.fillStyle = '#d4146a'; c.beginPath(); c.arc(x - 2, y - 24, 2.4, 0, 7); c.fill();
+  c.strokeStyle = '#14213d'; c.lineWidth = 1.3; c.beginPath(); c.arc(x + 4, y - 20, 2, 0, 7); c.stroke();
+  c.fillStyle = '#14213d'; c.font = '900 8px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('조선 8도', x, y - 13);
+  drawLabel(c, x, y - 54, '8도 안내판', 'rgba(30,60,120,.92)');
+  if (!S.sign) { var b = Math.sin(anim * 5) * 2; c.fillStyle = '#ffdf4a'; c.strokeStyle = '#7a5410'; c.lineWidth = 2; c.font = '900 16px sans-serif'; c.strokeText('!', x, y - 70 + b); c.fillText('!', x, y - 70 + b); }
+}
+function drawNpc(a) {
+  if (a.type === 'sign') return drawSign(a);
+  var o = a.look; var o2 = { robe: o.robe, hat: o.hat, face: 'd', bob: Math.sin(anim * 2 + a.tx) * .8, pack: a.type === 'shop', cane: !!o.cane };
+  drawPerson(ctx, a.px, a.py, o2);
+  var ly = a.py - 28, done = a.type === 'lesson' && S.stamps[a.id], locked = a.type === 'lesson' && !done && !!lockLines(a);
+  var txt = locked ? '🔒 ' + a.label : (a.type === 'lesson' && !done ? a.label : (a.type === 'lesson' ? '✔ ' + a.name : a.label));
+  drawLabel(ctx, a.px, ly, txt, locked ? 'rgba(110,40,40,.92)' : (done ? 'rgba(30,110,60,.9)' : (a.type === 'lesson' ? null : 'rgba(150,50,40,.9)')));
+  var mark = (a.type === 'lesson' && !done && !locked) || (a.type === 'king' && allDone() && !S.done) || (a.type === 'goblin' && !S.intro);
+  if (mark) { var b = Math.sin(anim * 5 + a.tx) * 2; ctx.fillStyle = '#ffdf4a'; ctx.strokeStyle = '#7a5410'; ctx.lineWidth = 2; ctx.font = '900 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.strokeText('!', a.px, ly - 16 + b); ctx.fillText('!', a.px, ly - 16 + b); }
+  if (a.type === 'king' && !allDone()) { ctx.font = '700 11px sans-serif'; }
+}
+function drawPlayer() {
+  var bob = P.moving ? Math.abs(Math.sin(P.step)) * -2 : 0, sw = P.moving ? Math.sin(P.step) : 0;
+  drawPerson(ctx, P.x, P.y - 2, { robe: '#2f6fdb', hat: 'none', face: P.face, bob: bob, swing: sw, collar: true });
+  if (race) { ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fillRect(P.x - 14 - (P.moving ? 6 : 0), P.y + 4, 10, 2); }
+}
+var gateOpen = false, lockMsgT = 0;
+function zoneDone(z) { return NPCS.filter(function (a) { return a.z === z; }).every(function (a) { return S.stamps[a.id]; }); }
+function setGate(open) {
+  var c = mapCv.getContext('2d');
+  [10, 11].forEach(function (y) { map[y][44] = open ? G.GATE : G.LOCK; drawTile(c, map[y][44], 44, y); });
+  gateOpen = open;
+}
+function syncShip() { shipP = S.stamps.sugun ? 1 : 0; }
+function syncGate() { var want = zoneDone(0); if (want !== gateOpen) setGate(want); }
+function drawGateLabel() {
+  var x = 44.5 * T, y = 10 * T - 10;
+  if (gateOpen) { drawLabel(ctx, x, y, '🔓 감영 마을 →', 'rgba(30,110,60,.92)'); var b = Math.sin(anim * 5) * 3; ctx.fillStyle = '#ffdf4a'; ctx.strokeStyle = '#7a5410'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(44.5 * T + 14 + b, 11 * T); ctx.lineTo(44.5 * T + 2 + b, 11 * T - 8); ctx.lineTo(44.5 * T + 2 + b, 11 * T + 8); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  else drawLabel(ctx, x, y, '🔒 동문', 'rgba(150,50,40,.92)');
+}
+var last = performance.now();
+function frame(ts) { var dt = Math.min(.05, (ts - last) / 1000); last = ts; try { update(dt); draw(); } catch (e) { if (window.console) console.error(e); } requestAnimationFrame(frame); }
+
+/* ---------- HUD / util ---------- */
+function stampCount() { var n = 0; for (var k in S.stamps) n++; return n; }
+function hud() {
+  $('hCoin').textContent = S.coins; $('hHint').textContent = S.hints; $('hStamp').textContent = stampCount() + '/' + TOTAL;
+  var hp = Math.max(0, Math.min(3, S.hp)); $('hHp').textContent = '❤️'.repeat(hp) + '🖤'.repeat(3 - hp); $('hHp').style.display = zOn() ? '' : 'none';
+  $('bZ').textContent = zOn() ? '🧟 ON' : '🧟 OFF';
+}
+/* ---------- zombies ---------- */
+var ZOMB = [], ZFX = [], zRespawn = [], invul = 0, zq = null, hbT = 0, regenT = 0, danger = 0;
+function zOn() { return !!S && !S.zoff && !S.done; }
+function zTarget() { return Math.min(13, 9 + Math.floor(stampCount() / 6)); }
+function spawnZombie() {
+  for (var g = 0; g < 60; g++) {
+    var t = WILD[Math.floor(Math.random() * WILD.length)], x = (t[0] + .5) * T, y = (t[1] + .5) * T;
+    if (Math.hypot(x - P.x, y - P.y) < 10 * T) continue;
+    ZOMB.push({ x: x, y: y, dx: 0, dy: 0, ch: false, t: 0, face: 'd', stun: 0, say: 0, groan: 4 + Math.random() * 8, ph: Math.random() * 6 });
+    return;
+  }
+}
+function zCan(x, y) {
+  var r = .26 * T, pts = [[x - r, y - r], [x + r, y - r], [x - r, y + r], [x + r, y + r]];
+  for (var i = 0; i < 4; i++) { var tx = Math.floor(pts[i][0] / T), ty = Math.floor(pts[i][1] / T); if (tx < 0 || ty < 0 || tx >= MW || ty >= MH) return false; if (SOLID[map[ty][tx]] || blk[ty * MW + tx] || safeTile(tx, ty)) return false; }
+  return true;
+}
+function updateZombies(dt) {
+  if (!zOn()) { danger = 0; return; }
+  if (invul > 0) invul -= dt;
+  var pSafe = safeTile(Math.floor(P.x / T), Math.floor(P.y / T)), i;
+  if (pSafe && S.hp < 3) { regenT += dt; if (regenT > 20) { regenT = 0; S.hp++; hud(); save(); toast('❤ 등불 아래에서 쉬었더니 체력이 회복되었다'); } } else regenT = 0;
+  for (i = zRespawn.length - 1; i >= 0; i--) { zRespawn[i] -= dt; if (zRespawn[i] <= 0) { zRespawn.splice(i, 1); spawnZombie(); } }
+  for (var guard = 0; ZOMB.length + zRespawn.length < zTarget() && guard < 20; guard++) spawnZombie();
+  var sp = 1 + .05 * Math.floor(stampCount() / 5), near = 99 * T;
+  ZOMB.forEach(function (z) {
+    z.ph += dt; if (z.say > 0) z.say -= dt;
+    if (z.stun > 0) { z.stun -= dt; return; }
+    var dx = P.x - z.x, dy = P.y - z.y, d = Math.hypot(dx, dy) || 1, vx, vy, spd;
+    if (!pSafe && d < 6.5 * T) z.ch = true; else if (pSafe || d > 9 * T) z.ch = false;
+    if (z.ch) { vx = dx / d; vy = dy / d; spd = 3.3 * sp; near = Math.min(near, d); }
+    else {
+      z.t -= dt;
+      if (z.t <= 0) { var a = Math.random() * 6.283; z.dx = Math.cos(a); z.dy = Math.sin(a); z.t = 1.5 + Math.random() * 2.5; if (Math.random() < .3) { z.dx = 0; z.dy = 0; } }
+      vx = z.dx; vy = z.dy; spd = 1.1;
+    }
+    var nx = z.x + vx * spd * T * dt, ny = z.y + vy * spd * T * dt, moved = false;
+    if (zCan(nx, z.y)) { z.x = nx; moved = true; }
+    if (zCan(z.x, ny)) { z.y = ny; moved = true; }
+    if (!moved && !z.ch) z.t = 0;
+    if (Math.abs(vx) > Math.abs(vy)) z.face = vx > 0 ? 'r' : 'l'; else if (vx || vy) z.face = vy > 0 ? 'd' : 'u';
+    z.groan -= dt; if (z.groan <= 0) { z.groan = 6 + Math.random() * 9; if (d < 9 * T) { z.say = 1.6; tone(95 + Math.random() * 30, .45, 'sawtooth', .02); } }
+    if (z.ch && d < .62 * T && invul <= 0 && !zq && mode === 'play') startZQ(z);
+  });
+  danger = near < 90 * T ? Math.max(0, Math.min(1, (7 * T - near) / (5 * T))) : 0;
+  if (danger > 0) { hbT -= dt; if (hbT <= 0) { tone(62, .1, 'sine', .22); tone(52, .12, 'sine', .18, .17); hbT = 1.05 - .55 * danger; } }
+  for (i = ZFX.length - 1; i >= 0; i--) { ZFX[i].t += dt; if (ZFX[i].t > 1.8) ZFX.splice(i, 1); }
+}
+function zQuestion() {
+  var pool = [];
+  NPCS.forEach(function (n) { if (!S.stamps[n.id]) return; if (n.parts) n.parts.forEach(function (p) { pool.push({ q: p.q, o: p.o }); }); else pool.push({ q: n.q, o: n.o }); });
+  if (pool.length < 3) pool = pool.concat(FINAL_POOL);
+  var it = pool[Math.floor(Math.random() * pool.length)], wrong = it.o.slice(1);
+  return { q: it.q, a: it.o[0], opts: shuf([it.o[0], wrong[Math.floor(Math.random() * wrong.length)]]) };
+}
+function startZQ(z) {
+  var qq = zQuestion(); zq = { z: z, t: 8, q: qq, done: false };
+  setMode('zq'); tone(70, .5, 'sawtooth', .06); tone(140, .3, 'square', .04, .05);
+  $('zqT').textContent = '🧟 좀비에게 붙잡혔다!'; $('zqQ').textContent = qq.q; $('zqR').textContent = ''; $('zqBar').style.width = '100%';
+  var box = $('zqO'); box.innerHTML = '';
+  qq.opts.forEach(function (t, i) { var b = document.createElement('button'); b.textContent = (i + 1) + '. ' + t; b.onclick = function () { answerZQ(i); }; box.appendChild(b); });
+  $('zq').classList.remove('hide');
+}
+function tickZQ(dt) { if (!zq || zq.done) return; zq.t -= dt; $('zqBar').style.width = Math.max(0, zq.t / 8 * 100) + '%'; if (zq.t <= 0) answerZQ(-1); }
+function flash() { var f = $('flash'); f.classList.add('on'); setTimeout(function () { f.classList.remove('on'); }, 60); }
+function answerZQ(i) {
+  if (!zq || zq.done) return; zq.done = true;
+  var ok = i >= 0 && zq.q.opts[i] === zq.q.a, z = zq.z;
+  if (ok) {
+    sfx.ok(); S.cured++; S.coins += 1; hud();
+    $('zqR').textContent = '✨ 정신이 돌아왔다! "고맙소… 덕분에 살았소!" (엽전 +1)';
+    var ix = ZOMB.indexOf(z); if (ix >= 0) ZOMB.splice(ix, 1); zRespawn.push(30 + Math.random() * 20); ZFX.push({ x: z.x, y: z.y, t: 0 });
+  } else {
+    sfx.no(); S.hp = Math.max(0, S.hp - 1); hud(); flash();
+    $('zqR').textContent = (i < 0 ? '⏰ 시간 초과! ' : '❌ 틀렸다! ') + '정답은 "' + zq.q.a + '" — 좀비에게 휘청! ❤ -1';
+    z.stun = 2.2; invul = 2.5;
+    var dx = P.x - z.x, dy = P.y - z.y, d = Math.hypot(dx, dy) || 1;
+    for (var k = 1.6; k > 0; k -= .2) { var nx = P.x + dx / d * k * T, ny = P.y + dy / d * k * T; if (canStand(nx, ny)) { P.x = nx; P.y = ny; break; } }
+  }
+  Array.prototype.forEach.call($('zqO').children, function (b, j) { b.disabled = true; if (zq.q.opts[j] === zq.q.a) b.style.borderColor = '#53d27f'; });
+  save();
+  setTimeout(function () { $('zq').classList.add('hide'); var dead = S.hp <= 0; zq = null; setMode('play'); if (dead) faint(); }, ok ? 1300 : 2000);
+}
+function faint() {
+  var lost = Math.min(3, S.coins); S.coins -= lost; S.hp = 3; P.x = 31.5 * T; P.y = 20.5 * T; invul = 3; hud(); save();
+  toast('😵 기절했다… 도깨비가 광장으로 데려다 주었다' + (lost ? ' (엽전 -' + lost + ')' : ''));
+}
+function drawZombie(z) {
+  var c = ctx, cx = z.x, cy = z.y - 2 + Math.sin(z.ph * 6), fy = cy + 11, sw = Math.sin(z.ph * 4) * 1.5, rob = '#6f6a5c', sk = '#9cc58a', i;
+  c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(cx, cy + 12, 9, 3.5, 0, 0, 7); c.fill();
+  rc(c, '#3b3a33', cx - 5, fy - 7 + (Math.sin(z.ph * 7) > 0 ? -1 : 0), 4, 7); rc(c, '#3b3a33', cx + 1, fy - 7 + (Math.sin(z.ph * 7) < 0 ? -1 : 0), 4, 7);
+  rc(c, rob, cx - 7, fy - 18, 14, 12); c.fillStyle = rob;
+  for (i = 0; i < 4; i++) { c.beginPath(); c.moveTo(cx - 7 + i * 3.5, fy - 6); c.lineTo(cx - 5.2 + i * 3.5, fy - 3); c.lineTo(cx - 3.5 + i * 3.5, fy - 6); c.fill(); }
+  rc(c, '#57534a', cx - 7, fy - 12, 14, 2);
+  if (z.face === 'l') { rc(c, rob, cx - 16, fy - 17 + sw, 10, 4); rc(c, sk, cx - 19, fy - 17 + sw, 4, 4); }
+  else if (z.face === 'r') { rc(c, rob, cx + 6, fy - 17 + sw, 10, 4); rc(c, sk, cx + 15, fy - 17 + sw, 4, 4); }
+  else if (z.face === 'd') { rc(c, rob, cx - 9, fy - 17, 4, 9); rc(c, rob, cx + 5, fy - 17, 4, 9); rc(c, sk, cx - 9, fy - 9 + sw, 4, 4); rc(c, sk, cx + 5, fy - 9 - sw, 4, 4); }
+  else { rc(c, rob, cx - 10, fy - 17, 3, 8); rc(c, rob, cx + 7, fy - 17, 3, 8); }
+  var hx = cx + sw * .4;
+  c.fillStyle = sk; c.beginPath(); c.arc(hx, fy - 23, 6.5, 0, 7); c.fill();
+  rc(c, '#2b2b2b', hx - 7, fy - 30, 14, 4); rc(c, '#2b2b2b', hx - 7, fy - 28, 3, 5); rc(c, '#2b2b2b', hx + 3, fy - 31, 3, 3);
+  if (z.face !== 'u') {
+    var ex = z.face === 'l' ? -1.5 : z.face === 'r' ? 1.5 : 0;
+    c.fillStyle = '#fffbe6'; c.beginPath(); c.arc(hx - 2.5 + ex, fy - 24, 2, 0, 7); c.fill(); c.beginPath(); c.arc(hx + 2.5 + ex, fy - 24, 2, 0, 7); c.fill();
+    rc(c, '#222', hx - 3 + ex, fy - 24, 1.2, 1.2); rc(c, '#222', hx + 2 + ex, fy - 24, 1.2, 1.2); rc(c, '#3d5a35', hx - 2 + ex, fy - 20, 4, 1.5);
+  }
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  if (z.stun > 0) { c.font = '700 12px sans-serif'; c.fillText('💫', cx, fy - 37); }
+  else if (z.ch) { c.fillStyle = '#ff4d3d'; c.strokeStyle = '#2b0a0a'; c.lineWidth = 2; c.font = '900 15px sans-serif'; c.strokeText('!', cx, fy - 38); c.fillText('!', cx, fy - 38); }
+  if (z.say > 0) drawLabel(c, cx, fy - 50, '으어어…', 'rgba(40,60,30,.9)');
+}
+function drawZFX() {
+  ZFX.forEach(function (f) {
+    var a = 1 - f.t / 1.8; ctx.globalAlpha = Math.max(0, a);
+    ctx.strokeStyle = '#ffdf4a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(f.x, f.y, 8 + f.t * 28, 0, 7); ctx.stroke();
+    drawPerson(ctx, f.x, f.y - f.t * 6, { robe: '#d9cfb8', hat: 'band', face: 'd' });
+    drawLabel(ctx, f.x, f.y - 44 - f.t * 14, '✨ 정신이 돌아왔다!', 'rgba(30,110,60,.9)');
+    ctx.globalAlpha = 1;
+  });
+}
+var fogCv = document.createElement('canvas'), fgx = fogCv.getContext('2d');
+function drawNight(camX, camY, k) {
+  if (fogCv.width !== cv.width || fogCv.height !== cv.height) { fogCv.width = cv.width; fogCv.height = cv.height; }
+  var f = fgx, W = fogCv.width, H = fogCv.height;
+  function sx(v) { return (v - camX) * k; } function sy(v) { return (v - camY) * k; }
+  f.setTransform(1, 0, 0, 1, 0, 0); f.globalCompositeOperation = 'source-over'; f.clearRect(0, 0, W, H);
+  f.fillStyle = 'rgba(6,10,26,.80)'; f.fillRect(0, 0, W, H);
+  f.globalCompositeOperation = 'destination-out';
+  f.fillStyle = 'rgba(0,0,0,.62)';
+  ZONES.forEach(function (z) { var r = z.r; f.fillRect(sx(r[0] * T), sy(r[1] * T), r[2] * T * k, r[3] * T * k); });
+  f.fillRect(sx(SPAWN_SAFE[0] * T), sy(SPAWN_SAFE[1] * T), SPAWN_SAFE[2] * T * k, SPAWN_SAFE[3] * T * k);
+  f.fillRect(sx(26 * T), sy(24 * T), 5 * T * k, 5 * T * k);
+  ALL.forEach(function (a) {
+    var gx = sx(a.px), gy = sy(a.py), R = 2.2 * T * k; if (gx < -R || gy < -R || gx > W + R || gy > H + R) return;
+    var g = f.createRadialGradient(gx, gy, 0, gx, gy, R); g.addColorStop(0, 'rgba(0,0,0,.6)'); g.addColorStop(1, 'rgba(0,0,0,0)'); f.fillStyle = g; f.fillRect(gx - R, gy - R, 2 * R, 2 * R);
+  });
+  var px = sx(P.x), py = sy(P.y), R = (4.6 + Math.sin(anim * 7) * .08) * T * k;
+  var g2 = f.createRadialGradient(px, py, R * .15, px, py, R); g2.addColorStop(0, 'rgba(0,0,0,1)'); g2.addColorStop(.6, 'rgba(0,0,0,.85)'); g2.addColorStop(1, 'rgba(0,0,0,0)'); f.fillStyle = g2; f.fillRect(px - R, py - R, 2 * R, 2 * R);
+  f.globalCompositeOperation = 'source-over';
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(fogCv, 0, 0);
+  if (danger > 0) {
+    var pulse = .5 + .5 * Math.max(0, Math.sin(anim * (4 + danger * 6))), vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .7);
+    vg.addColorStop(0, 'rgba(160,0,0,0)'); vg.addColorStop(1, 'rgba(170,0,0,' + (.18 + .3 * danger * pulse) + ')'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  }
+}
+var toastT = 0;
+function toast(t) { var el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove('show'); }, 2600); }
+function setMode(m) { mode = m; if (m !== 'play') { near = null; $('prompt').classList.add('hide'); } }
+
+/* ---------- dialog ---------- */
+var dlg = { mode: 'none', lines: [], i: 0, onEnd: null, next: null, btns: [], typing: false, full: '' }, typeT = 0;
+function openDlg(name) { $('dlg').classList.remove('hide'); $('dname').textContent = name; $('dfb').textContent = ''; $('dopts').innerHTML = ''; $('dhint').innerHTML = ''; setMode('dialog'); }
+function closeDlg() { clearInterval(typeT); dlg.mode = 'none'; $('dlg').classList.add('hide'); setMode('play'); save(); }
+function typeText(text) {
+  clearInterval(typeT); dlg.full = text; dlg.typing = true; var i = 0, el = $('dtext'); el.textContent = '';
+  typeT = setInterval(function () { i += 2; el.textContent = text.slice(0, i); if (i >= text.length) { clearInterval(typeT); dlg.typing = false; } }, 22);
+}
+function showLines(name, lines, onEnd) {
+  openDlg(name); dlg.mode = 'lines'; dlg.lines = lines; dlg.i = 0; dlg.onEnd = onEnd;
+  var nx = $('dnext'); nx.classList.remove('hide'); nx.textContent = lines.length > 1 ? '다음 ▶' : '확인 ▶';
+  typeText(lines[0]);
+}
+function advance() {
+  if (dlg.mode === 'lines') {
+    if (dlg.typing) { clearInterval(typeT); dlg.typing = false; $('dtext').textContent = dlg.full; return; }
+    if (dlg.i < dlg.lines.length - 1) { dlg.i++; typeText(dlg.lines[dlg.i]); $('dnext').textContent = dlg.i === dlg.lines.length - 1 ? '확인 ▶' : '다음 ▶'; sfx.ui(); }
+    else { var f = dlg.onEnd; dlg.mode = 'none'; if (f) f(); else closeDlg(); }
+  } else if (dlg.mode === 'fb') { var n = dlg.next; dlg.mode = 'none'; if (n) n(); else closeDlg(); }
+}
+function showChoices(name, text, btns) {
+  openDlg(name); dlg.mode = 'choices'; dlg.btns = btns; $('dnext').classList.add('hide'); typeText(text);
+  var box = $('dopts');
+  btns.forEach(function (b, i) { var el = document.createElement('button'); el.className = 'opt'; el.innerHTML = '<i>' + (i + 1) + '</i>' + b.label; el.onclick = function () { sfx.ui(); b.fn(); }; box.appendChild(el); });
+}
+function showQuiz(name, qo, opts) {
+  openDlg(name); dlg.mode = 'quiz'; $('dnext').classList.add('hide');
+  var wrongs = 0, hinted = false, off = {}, order = shuf(qo.o), btnEls = [];
+  function render(fb) {
+    $('dtext').textContent = qo.q; $('dfb').textContent = fb || '';
+    var box = $('dopts'); box.innerHTML = ''; btnEls = [];
+    order.forEach(function (t, i) {
+      var b = document.createElement('button'); b.className = 'opt'; b.innerHTML = '<i>' + (i + 1) + '</i>' + t; b.disabled = !!off[t];
+      b.onclick = function () { pick(t); }; box.appendChild(b); btnEls.push(b);
+    });
+    var h = $('dhint');
+    if (S.hints > 0) { h.innerHTML = '<button id="useHint">🧿 힌트 부적 사용 (' + S.hints + ')</button>'; $('useHint').onclick = useHint; } else h.innerHTML = '<span class="muted">🧿 힌트 부적은 보부상에게서 살 수 있어요</span>';
+  }
+  function useHint() {
+    var cand = order.filter(function (t) { return t !== qo.a && !off[t]; });
+    if (cand.length < 2 || S.hints <= 0) return;
+    var t = cand[Math.floor(Math.random() * cand.length)]; off[t] = 1; S.hints--; hinted = true; sfx.ui(); hud(); save(); render('🧿 틀린 보기 하나가 사라졌어요!');
+  }
+  function pick(t) {
+    if (dlg.mode !== 'quiz') return;
+    if (t === qo.a) {
+      if (!opts.fanfare) sfx.ok(); var msg = opts.onCorrect({ wrongs: wrongs, hinted: hinted });
+      dlg.mode = 'fb'; dlg.next = opts.after; $('dopts').innerHTML = ''; $('dhint').innerHTML = ''; $('dfb').textContent = ''; typeText(msg);
+      $('dnext').classList.remove('hide'); $('dnext').textContent = '확인 ▶';
+    } else {
+      sfx.no(); wrongs++; S.wrongs++; S.streak = 0; off[t] = 1; render('❌ 아쉬워요! 방금 들은 설명을 떠올려 봐요.');
+      var bx = $('dbox'); bx.classList.remove('shake'); void bx.offsetWidth; bx.classList.add('shake'); save();
+    }
+  }
+  dlg.pick = function (i) { if (btnEls[i] && !btnEls[i].disabled) btnEls[i].click(); };
+  render('');
+}
+function stampAnim(txt) { var s = $('stamp'); s.textContent = txt || '통과!'; s.classList.remove('go'); void s.offsetWidth; s.classList.add('go'); sfx.stamp(); }
+
+/* ---------- NPC interaction ---------- */
+var MINI_NAME = { beacon: '🔥 봉수대 불 올리기', archery: '🏹 활쏘기 시험', race: '🐎 역참 달리기', memory: '🗄 약장 서랍 짝 맞추기' };
+var MINI_INTRO = { beacon: '봉수대에 불을 올려 보겠나?', archery: '활쏘기 한판 해 보겠나?', race: '말을 타고 공문서를 배달해 보겠나?', memory: '마침 약장 서랍이 엉망이오. 이름표와 쪽지를 짝지어 정리하는 걸 도와주겠소?' };
+function startMini(n) { if (n.mini === 'memory') miniMemory(); else if (n.mini === 'beacon') miniBeacon(); else if (n.mini === 'archery') miniArchery(); else if (n.mini === 'race') startRace(); }
+function interact(n) {
+  if (n.type === 'sign') return openProv();
+  if (n.type === 'goblin') return goblin(false);
+  if (n.type === 'shop') return shop('');
+  if (n.type === 'king') return king();
+  lesson(n);
+}
+function lessonParts(n) {
+  if (S.stamps[n.id]) {
+    showChoices(n.label, '또 오셨구려. 고려와 조선이 어떻게 달라졌는지 다시 들려줄까?', [{ label: '①②③ 다시 듣기', fn: function () { var all = []; n.parts.forEach(function (p) { all = all.concat(p.lines); }); showLines(n.label, all, closeDlg); } }, { label: '닫기', fn: closeDlg }]);
+    return;
+  }
+  partRun(n, Math.min(S.part[n.id] || 0, n.parts.length - 1));
+}
+function partRun(n, i) {
+  var pt = n.parts[i], last = i === n.parts.length - 1;
+  showLines(n.label, (i === 0 ? n.intro : []).concat(pt.lines), function () {
+    showQuiz(n.label + ' · ' + (i + 1) + '/' + n.parts.length, { q: pt.q, o: pt.o, a: pt.o[0] }, {
+      fanfare: last,
+      onCorrect: function (res) {
+        var g = res.wrongs === 0 && !res.hinted ? 2 : 1; S.coins += g; S.part[n.id] = i + 1;
+        if (last) { S.stamps[n.id] = 1; stampAnim('통과!'); sfx.fan(); burst(14); }
+        hud(); save();
+        return '⭕ 정답!\n📌 ' + pt.sum + '\n🪙 엽전 +' + g + (last ? '\n\n📜 고려와 조선의 지방 행정 차이를 모두 배웠다! 도장을 받았다.' : '');
+      },
+      after: function () { if (!last) partRun(n, i + 1); else { closeDlg(); if (stampCount() === TOTAL) toast('👑 임금님을 찾아가자! (궁궐 안쪽)'); } }
+    });
+  });
+}
+function lockLines(n) {
+  if (S.stamps[n.id]) return null;
+  if (n.id === 'seonggyun' && !S.stamps.sogwa) return ['멈추시오! 이곳은 성균관이오. 아무나 들어올 수 없소.', '성균관에는 소과(생원시·진사시)에 합격해 생원·진사가 된 선비만 입학할 수 있소. 소과에 응시해 합격하지 않은 자는 이 문을 지나지 못하오!', '먼저 과거 시험장(담장으로 둘러싸인 곳)의 문과 구역으로 가서 소과 시험관 남궁선의 시험을 통과하고 오시오.'];
+  if (n.id === 'daegwa' && !S.stamps.seonggyun) return S.stamps.sogwa
+    ? ['소과에 합격했구려! 하지만 대과는 성균관에서 공부한 유생이 주로 응시하는 시험이오.', '먼저 성균관(오른쪽 아래)의 대사성을 만나 입학하고 오시오.']
+    : ['대과는 문과의 두 번째 단계요. 소과에 합격하지 못한 자는 응시할 수 없소.', '먼저 옆의 소과 시험관 남궁선에게 가서 소과를 통과하고 오시오.'];
+  return null;
+}
+function lesson(n) {
+  var done = !!S.stamps[n.id], lk = lockLines(n);
+  if (lk) { showLines(n.label, lk, closeDlg); return; }
+  if (n.parts) { lessonParts(n); return; }
+  if (!done) { showLines(n.label, n.lines, function () { quiz(n); }); return; }
+  var btns = [{ label: '설명 다시 듣기', fn: function () { showLines(n.label, n.lines, closeDlg); } }, { label: '퀴즈 다시 풀기 (연습)', fn: function () { showQuiz(n.label, { q: n.q, o: n.o, a: n.a }, { onCorrect: function () { return '⭕ 좋아요! 복습 완료.'; }, after: closeDlg }); } }];
+  if (n.mini) btns.push({ label: MINI_NAME[n.mini], fn: function () { closeDlg(); startMini(n); } });
+  btns.push({ label: '닫기', fn: closeDlg });
+  showChoices(n.label, '또 왔구려. 무엇을 도와줄까?', btns);
+}
+var justOpened = false, justShip = false;
+function quiz(n) {
+  showQuiz(n.label, { q: n.q, o: n.o, a: n.a }, {
+    fanfare: true,
+    onCorrect: function (res) {
+      var g = res.wrongs === 0 && !res.hinted ? 3 : res.wrongs <= 1 ? 2 : 1;
+      var bonus = '';
+      if (res.wrongs === 0 && !res.hinted) { S.streak++; if (S.streak >= 3 && S.streak % 3 === 0) { g++; bonus = '\n🔥 ' + S.streak + '연속 정답 보너스!'; } } else S.streak = 0;
+      S.coins += g; S.stamps[n.id] = 1; hud(); save(); stampAnim('통과!');
+      var gateMsg = '', big = false;
+      if (!gateOpen && zoneDone(0)) { setGate(true); justOpened = true; gateMsg = '\n\n🚪 궁궐 동쪽 문이 열렸다! 감영 마을로 가는 길이 생겼어요.'; big = true; }
+      if (n.id === 'sogwa') gateMsg += '\n\n📜 소과에 합격했다! 이제 성균관의 대사성을 만날 수 있다.';
+      if (n.id === 'seonggyun') gateMsg += '\n\n🎓 성균관 유생이 되었다! 이제 대과 시험관에게 도전할 수 있다.';
+      if (n.id === 'sugun') { justShip = true; gateMsg += '\n\n🐢 남쪽 호수에 거북선이 나타났다!'; big = true; }
+      if (big) sfx.win(); else { sfx.fan(); burst(14); }
+      var left = TOTAL - stampCount();
+      return '⭕ 정답! 도장을 받았다.\n📌 ' + n.name + ': ' + n.sum + '\n🪙 엽전 +' + g + bonus + gateMsg + (left === 0 ? '\n\n🎉 모든 도장을 모았다! 임금님께 가 보자.' : '');
+    },
+    after: function () {
+      if (justShip) { justShip = false; setTimeout(function () { toast('🐢 거북선이 나타났다! 아래쪽 호수를 보자 ↓'); }, 300); }
+      if (justOpened) { justOpened = false; setTimeout(function () { toast('🚪 궁궐 동쪽 문이 열렸다! 동쪽으로 가 보자 →'); }, 300); }
+      if (!S.samsa && SAMSA.every(function (id) { return S.stamps[id]; })) { samsa(); return; }
+      if (!S.bond && S.stamps.suryeong && S.stamps.hyangri) { bondScene(); return; }
+      if (n.mini) showChoices(n.label, '잘했네! ' + MINI_INTRO[n.mini], [{ label: '🎮 도전! ' + MINI_NAME[n.mini], fn: function () { closeDlg(); startMini(n); } }, { label: '나중에', fn: closeDlg }]);
+      else closeDlg();
+      if (stampCount() === TOTAL) toast('👑 임금님을 찾아가자! (궁궐 안쪽)');
+    }
+  });
+}
+function samsa() {
+  var lines = ['사헌부, 사간원, 홍문관… 세 관청을 모두 찾아왔구나!', '세 관리가 나란히 선다.\n"우리 셋을 합쳐 3사(三司)라 부르오. 관리를 감찰하고(사헌부), 왕에게 간언하고(사간원), 왕의 자문에 응하며(홍문관) 왕과 관리를 견제했소."', '"이제 우리 세 기관이 하나로 엮였소! 3사 합동 시험을 통과하면 청사의 문이 활짝 열릴 것이오."'];
+  showLines('3사 합동', lines, function () {
+    showQuiz('3사 합동 시험 1/2', { q: '3사에 속하지 않는 기관은?', o: ['승정원', '사헌부', '사간원', '홍문관'], a: '승정원' }, {
+      onCorrect: function () { return '⭕ 맞다! 승정원은 왕의 비서 기관이고, 3사는 사헌부·사간원·홍문관이다.'; },
+      after: function () {
+        showQuiz('3사 합동 시험 2/2', { q: '3사의 공통된 역할로 알맞은 것은?', o: ['언론 기능으로 왕과 관리를 견제', '6조를 거느리고 행정 실무 집행', '왕명을 출납하는 비서 역할', '중앙군을 지휘해 한양 방어'], a: '언론 기능으로 왕과 관리를 견제' }, {
+          fanfare: true,
+          onCorrect: function () {
+            S.samsa = true; S.coins += 6; hud(); save(); samsaT0 = anim; stampAnim('3사!'); sfx.win();
+            return '🔗 3사가 하나로 엮였다!\n📌 3사: 사헌부·사간원·홍문관 — 언론 기능으로 왕과 관리를 견제\n🪙 엽전 +6';
+          },
+          after: function () { closeDlg(); toast('✨ 3사 청사에 불이 켜졌다!'); if (stampCount() === TOTAL) setTimeout(function () { toast('👑 임금님을 찾아가자! (궁궐 안쪽)'); }, 2800); }
+        });
+      }
+    });
+  });
+}
+function bondScene() {
+  var lines = ['수령과 향리, 두 사람을 모두 만났구나!', '수령이 말한다.\n"나는 부·목·군·현에 파견되어 고을을 다스리고 행정·사법·군사를 맡고 있소."\n향리가 고개를 숙인다.\n"저는 수령님 아래에서 행정 실무를 맡아 일을 돕사옵니다."', '"수령이 일을 지시하면 향리가 실무를 처리해 보고하오. 이렇게 서로 도우며 고을을 다스린다오. 그 관계를 맞혀 보시오!"'];
+  showLines('수령 · 향리', lines, function () {
+    showQuiz('수령 · 향리 합동 시험', { q: '수령과 향리의 관계로 알맞은 것은?', o: ['수령이 고을을 다스리고, 향리가 수령 아래에서 행정 실무를 맡아 돕는다', '향리가 수령 위에서 수령을 파견하고 감독한다', '수령과 향리는 모두 중앙에서 고을로 파견되었다', '향리가 관찰사를 도와 도 전체를 다스린다'], a: '수령이 고을을 다스리고, 향리가 수령 아래에서 행정 실무를 맡아 돕는다' }, {
+      fanfare: true,
+      onCorrect: function () {
+        S.bond = true; S.coins += 4; hud(); save(); bondT0 = anim; stampAnim('협력!'); sfx.win();
+        return '🤝 수령과 향리가 서로 돕는 사이가 되었다!\n📌 수령은 고을을 다스리고, 향리는 수령 아래에서 행정 실무를 맡아 도움\n🪙 엽전 +4';
+      },
+      after: function () { closeDlg(); toast('✨ 수령과 향리 사이에 명령과 보고가 오가요!'); if (stampCount() === TOTAL) setTimeout(function () { toast('👑 임금님을 찾아가자! (궁궐 안쪽)'); }, 2800); }
+    });
+  });
+}
+function goblin(first) {
+  var lines = ['어이쿠, 조선에 온 걸 환영한다, 이방인!', '너는 낡은 학습지의 빛에 빨려 들어왔다. 조선의 통치 체제를 모두 배워야 돌아갈 수 있어!', '…발이 가벼워진다! 달리기 신발 장착 완료 👟\nShift를 누르고 이동하면 달릴 수 있어. 숨이 차면 잠깐 걸어서 쉬어라.', '네 구역을 돌며 관리들에게 설명을 듣고 퀴즈를 맞히면 도장을 준다. 도장 ' + TOTAL + '개를 모아 임금님을 만나라!\n궁궐 관청의 문제를 모두 풀면 동쪽 문이 열려 감영 마을로 갈 수 있다. 엽전과 보물 상자도 찾아봐. 길을 잃으면 M(지도), 복습은 J(학습지)!'];
+  if (zOn()) lines.splice(3, 0, '그런데 큰일이다! 밤이 되자 괴질이 퍼져 사람들이 좀비가 되어 길을 떠돈다…', '등불이 밝은 관청 구역과 이 광장은 안전하다. 길에서 좀비에게 붙잡히면 퀴즈가 나온다! 맞히면 그 사람이 정신을 되찾고, 틀리면 체력(❤)이 줄어. 체력이 다 떨어지면 기절해서 엽전을 잃는다. 좀비가 보이면 Shift로 달려 도망쳐!');
+  if (first) { showLines('도깨비', lines, function () { S.intro = true; save(); closeDlg(); toast('먼저 가까운 궁궐(위쪽)부터 가 볼까?'); }); return; }
+  showChoices('도깨비', '무엇이 궁금하냐?', [{ label: '처음 설명 다시 듣기', fn: function () { showLines('도깨비', lines, closeDlg); } }, { label: '닫기', fn: closeDlg }]);
+}
+function shop(pre) {
+  var txt = (pre ? pre + '\n' : '') + '어서 오시오! 힌트 부적은 퀴즈에서 틀린 보기 하나를 지워 준다오. 엽전 3냥이면 한 장이오.';
+  showChoices('보부상', txt, [{ label: '🧿 힌트 부적 사기 (3 엽전)', fn: function () { if (S.coins >= 3) { S.coins -= 3; S.hints++; hud(); save(); sfx.coin(); shop('고맙소! 부적 한 장 받으시오. (엽전 ' + S.coins + ' / 부적 ' + S.hints + ')'); } else { sfx.no(); shop('엽전이 모자라오. 길에 떨어진 엽전을 주워 오시오!'); } } }, { label: '🌿 약초 사기 (체력 +1, 2 엽전)', fn: function () { if (S.hp >= 3) shop('이미 기운이 넘치는구려!'); else if (S.coins >= 2) { S.coins -= 2; S.hp++; hud(); save(); sfx.coin(); shop('약초를 먹으니 기운이 난다! (❤ ' + S.hp + '/3)'); } else { sfx.no(); shop('엽전이 모자라오.'); } } }, { label: '닫기', fn: closeDlg }]);
+}
+function king() {
+  var n = stampCount();
+  var z = zOn();
+  if (n < TOTAL) {
+    showLines('임금님', z
+      ? ['왔는가, 이방인… 성문 밖에서 들려오는 저 신음 소리가 들리느냐.', '아직 조선은 좀비의 위험에서 벗어나지 못했다. 괴질을 막으려면 나라를 다스리는 지혜가 모두 모여야 하느니라.', '그대가 모은 도장은 ' + n + '개, 아직 ' + (TOTAL - n) + '개가 남았다.\n관청을 모두 돌아 도장을 모아 오너라. 부디 길에서 몸조심하거라!']
+      : ['어서 오너라, 이방인. 나라를 다스리는 일을 배우러 왔느냐?', '아직 둘러보지 못한 관청이 있구나. (' + n + '/' + TOTAL + ')\n도장을 모두 모으면 마지막 시험을 보겠다.'], closeDlg);
+    return;
+  }
+  var lines = S.done
+    ? ['그대 덕분에 조선이 좀비의 위험에서 벗어났도다. 다시 왔구나! 한 번 더 시험해 볼까?']
+    : z
+      ? ['모든 관청의 도장을 모아 왔구나! 그대의 지혜가 이 나라를 구할 마지막 희망이다.', '이제 짐이 직접 어명을 내리겠다. 여섯 문제 가운데 많이 틀리지 않으면, 그 지혜로 괴질을 몰아낼 수 있으리라!']
+      : ['모든 관청을 돌아보았구나. 대견하도다!', '마지막으로 짐이 직접 문제를 내겠다. 여섯 문제 가운데 많이 틀리지 않으면 합격이다.'];
+  showLines('임금님', lines, function () { finalExam(); });
+}
+function finalExam() {
+  var qs = shuf(FINAL_POOL).slice(0, 6), i = 0, wrong = 0;
+  function next() {
+    if (i >= qs.length) { return end(); }
+    var q = qs[i];
+    showQuiz('임금님 · 어명 ' + (i + 1) + '/6', { q: q.q, o: q.o, a: q.o[0] }, {
+      onCorrect: function (res) { wrong += res.wrongs; return '⭕ 맞다!'; },
+      after: function () { i++; next(); }
+    });
+  }
+  function end() {
+    var z = zOn();
+    if (wrong <= 3) {
+      if (z) showLines('임금님', ['훌륭하도다! 그대 덕분에 조선이 좀비의 위험에서 벗어났도다!', '괴질에 걸렸던 백성들이 모두 정신을 되찾고, 이제 등불 없이도 밤길을 걸을 수 있게 되었구나.', '이 공을 기려 그대에게 관직을 내리노라!'], function () { closeDlg(); S.done = true; save(); showEnding(wrong, true); });
+      else { closeDlg(); S.done = true; save(); showEnding(wrong, false); }
+    }
+    else showChoices('임금님', (z ? '아직 지혜가 부족하구나… 이대로는 좀비를 막아 낼 수 없다. (오답 ' + wrong + '번)\n학습지(J)로 복습하고 다시 오너라.' : '허허, 아직 공부가 더 필요하구나. (오답 ' + wrong + '번)\n학습지(J)를 열어 복습하고 다시 오너라.'), [{ label: '바로 다시 도전', fn: finalExam }, { label: '복습하러 가기', fn: closeDlg }]);
+  }
+  next();
+}
+
+/* ---------- mini games ---------- */
+var miniRAF = 0, miniAct = null;
+function openMini(title, desc) { $('mTitle').textContent = title; $('mDesc').textContent = desc; $('mBody').innerHTML = ''; $('mRes').textContent = ''; $('mBtns').innerHTML = ''; $('mini').classList.remove('hide'); setMode('mini'); }
+function closeMini() { cancelAnimationFrame(miniRAF); miniAct = null; $('mini').classList.add('hide'); setMode('play'); save(); }
+function rewardMini(id, score) { var prev = S.minis[id] || 0, d = score - prev; if (d > 0) { S.minis[id] = score; S.coins += d; hud(); save(); sfx.coin(); return d; } return 0; }
+function miniButtons(retry) {
+  var b = $('mBtns'); b.innerHTML = '';
+  var r = document.createElement('button'); r.className = 'cbtn'; r.textContent = '다시 도전'; r.onclick = retry; b.appendChild(r);
+  var c = document.createElement('button'); c.className = 'cbtn'; c.style.background = '#3b6fa8'; c.textContent = '닫기'; c.onclick = closeMini; b.appendChild(c);
+}
+function miniMemory() {
+  openMini('🗄 약장 서랍 짝 맞추기', '서랍을 두 개씩 열어 "기관·제도 이름"과 "하는 일" 쪽지를 짝지어 보세요. 적게 열수록 보상이 커요!');
+  var ok = NPCS.filter(function (n) { return !n.parts && n.sum; });
+  var pick = shuf(ok.filter(function (n) { return S.stamps[n.id]; })).slice(0, 6);
+  if (pick.length < 6) pick = pick.concat(shuf(ok.filter(function (n) { return !S.stamps[n.id]; })).slice(0, 6 - pick.length));
+  var cards = [];
+  pick.forEach(function (n, i) { cards.push({ k: i, t: n.name, term: true }); cards.push({ k: i, t: n.sum, term: false }); });
+  cards = shuf(cards);
+  $('mBody').innerHTML = '<div class="mgrid">' + cards.map(function (c, i) { return '<button class="mcard" data-i="' + i + '" aria-label="서랍 ' + (i + 1) + '">🗄</button>'; }).join('') + '</div><div class="msg" id="mMoves">연 횟수: 0 · 찾은 짝: 0 / 6</div>';
+  var open = [], matched = 0, moves = 0, lock = false, done = {}, btns = $('mBody').querySelectorAll('.mcard');
+  function show(i) { var b = btns[i], c = cards[i]; b.classList.add('open'); if (c.term) b.classList.add('term'); b.textContent = c.t; }
+  function hide(i) { var b = btns[i]; b.classList.remove('open', 'term'); b.textContent = '🗄'; }
+  function finish() {
+    var score = moves <= 8 ? 6 : moves <= 11 ? 4 : moves <= 15 ? 3 : 2, g = rewardMini('memory', score);
+    sfx.win(); $('mRes').textContent = '🎉 약장 정리 끝! ' + moves + '번 만에 모두 짝지었어요.' + (g ? ' 엽전 +' + g : ' (이전 기록 이하라 보상은 없어요)');
+    miniButtons(miniMemory);
+  }
+  Array.prototype.forEach.call(btns, function (b, i) {
+    b.onclick = function () {
+      if (lock || done[i] || open.indexOf(i) >= 0) return;
+      show(i); open.push(i); sfx.ui();
+      if (open.length < 2) return;
+      moves++;
+      var a = cards[open[0]], c = cards[open[1]];
+      if (a.k === c.k && a.term !== c.term) {
+        open.forEach(function (j) { done[j] = 1; btns[j].classList.remove('open'); btns[j].classList.add('done'); if (cards[j].term) btns[j].classList.add('term'); });
+        open = []; matched++; sfx.coin();
+        if (matched === 6) finish();
+      } else {
+        lock = true; tone(220, .12, 'triangle', .04);
+        open.forEach(function (j) { btns[j].classList.remove('miss'); void btns[j].offsetWidth; btns[j].classList.add('miss'); });
+        var pair = open.slice(); open = [];
+        setTimeout(function () { pair.forEach(hide); lock = false; }, 950);
+      }
+      $('mMoves').textContent = '연 횟수: ' + moves + ' · 찾은 짝: ' + matched + ' / 6';
+    };
+  });
+}
+function miniBeacon() {
+  openMini('🔥 봉수대 불 올리기', '초록 구간에서 버튼(Space)을 눌러 불을 올려요. 5개를 모두 밝히면 한양까지 신호 도착! 3번 실패하면 연기가 흩어져요.');
+  $('mBody').innerHTML = '<div class="torches">' + [0, 1, 2, 3, 4].map(function (i) { return '<span class="tor" id="tor' + i + '">🔥</span>'; }).join('') + '</div><div class="bar"><div class="zone" id="bz"></div><div class="cur" id="bc"></div></div><button class="mbtn" id="bgo">불 올리기! (Space)</button>';
+  var lit = 0, miss = 0, pos = 0, dir = 1, W = [.30, .26, .22, .18, .15], zs = 0, over = false, lt = performance.now();
+  function zone() { zs = .04 + Math.random() * (.92 - W[lit]); $('bz').style.left = zs * 100 + '%'; $('bz').style.width = W[lit] * 100 + '%'; }
+  zone();
+  function loop(t) { var dt = Math.min(.05, (t - lt) / 1000); lt = t; pos += dir * (.7 + .16 * lit) * dt; if (pos > 1) { pos = 1; dir = -1; } if (pos < 0) { pos = 0; dir = 1; } $('bc').style.left = pos * 100 + '%'; if (!over) miniRAF = requestAnimationFrame(loop); }
+  miniRAF = requestAnimationFrame(loop);
+  function finish(ok) {
+    over = true; cancelAnimationFrame(miniRAF); miniAct = null;
+    if (ok) { var g = rewardMini('beacon', 4 + (3 - miss)); beaconBoost = 12; sfx.win(); $('mRes').textContent = '🎉 신호가 한양까지 닿았다!' + (g ? ' 엽전 +' + g : ' (이미 받은 보상이에요)'); }
+    else { sfx.no(); $('mRes').textContent = '💨 연기가 흩어졌다… 다시 해 볼까?'; }
+    miniButtons(miniBeacon);
+  }
+  function press() {
+    if (over) return;
+    if (pos >= zs && pos <= zs + W[lit]) { $('tor' + lit).classList.add('on'); lit++; sfx.coin(); if (lit >= 5) finish(true); else zone(); }
+    else { miss++; sfx.no(); $('mRes').textContent = '앗, 빗나갔다! (실패 ' + miss + '/3)'; if (miss >= 3) finish(false); }
+  }
+  miniAct = press; $('bgo').onclick = press;
+}
+function miniArchery() {
+  openMini('🏹 활쏘기 시험', '과녁이 가운데 빨간 조준선을 지날 때 쏘세요(Space)! 화살은 3발, 가운데에 가까울수록 높은 점수예요.');
+  $('mBody').innerHTML = '<div class="range" id="rg"><div class="aim"></div><div class="tgt" id="tg"></div></div><div id="arrows" style="font-size:28px">🏹🏹🏹</div><button class="mbtn" id="bgo">쏘기! (Space)</button>';
+  var shots = 0, score = 0, t = 0, over = false, lt = performance.now(), x = .5;
+  function loop(ts) { var dt = Math.min(.05, (ts - lt) / 1000); lt = ts; t += dt; x = .5 + .42 * Math.sin(t * (1.7 + .5 * shots)); $('tg').style.left = x * 100 + '%'; if (!over) miniRAF = requestAnimationFrame(loop); }
+  miniRAF = requestAnimationFrame(loop);
+  function shoot() {
+    if (over) return;
+    var d = Math.abs(x - .5), p = d < .035 ? 3 : d < .08 ? 2 : d < .15 ? 1 : 0;
+    score += p; shots++;
+    var h = document.createElement('div'); h.className = 'hit'; h.style.left = x * 100 + '%'; h.textContent = p ? '🎯' : '💨'; $('rg').appendChild(h);
+    $('mRes').textContent = p === 3 ? '명중! +3' : p === 2 ? '좋아요! +2' : p === 1 ? '아슬아슬 +1' : '빗나갔다…';
+    p ? sfx.coin() : sfx.no();
+    $('arrows').textContent = new Array(3 - shots + 1).join('🏹');
+    if (shots >= 3) { over = true; cancelAnimationFrame(miniRAF); miniAct = null; var g = rewardMini('archery', score); setTimeout(function () { if (score >= 4) sfx.win(); else sfx.ok(); $('mRes').textContent = '총 ' + score + '점!' + (g ? ' 엽전 +' + g : ' (이전 최고 기록 이하라 보상은 없어요)'); miniButtons(miniArchery); }, 500); }
+  }
+  miniAct = shoot; $('bgo').onclick = shoot;
+}
+function startRace() {
+  race = { i: 0, t: 26 }; $('racehud').classList.remove('hide'); toast('🐎 출발! 번호 순서대로 달려라 (Shift)');
+}
+function endRace(ok) {
+  var r = race; race = null; $('racehud').classList.add('hide');
+  if (ok) { var g = rewardMini('race', 5); sfx.win(); toast('🏁 도착! 공문서 배달 성공!' + (g ? ' 엽전 +' + g : '')); }
+  else { sfx.no(); toast('⏰ 시간 초과… 역졸에게 말을 걸어 다시 도전!'); }
+}
+
+/* ---------- journal / map / ending ---------- */
+var PROV = [
+  { id: 'hamgyeong', n: '함경도', c: '#fff0a8', lx: 352, ly: 118, fs: 13, gw: '함흥', bu: '함흥', d: 'M398,0L394,0L391,18L389,21L388,41L386,44L378,46L365,46L360,51L356,64L353,67L347,69L341,76L332,75L328,77L313,77L308,80L296,81L296,92L299,99L306,106L306,112L300,123L294,124L288,120L282,122L273,122L257,131L249,142L243,142L234,150L230,151L228,156L228,164L231,173L232,192L228,200L235,203L238,208L239,220L235,228L237,237L235,239L221,238L212,254L213,263L216,268L215,279L224,280L231,288L231,312L238,313L239,305L241,303L245,303L247,305L247,312L251,324L256,324L256,319L264,312L269,312L271,310L267,302L267,295L262,291L255,289L253,286L253,281L256,277L256,274L262,271L262,261L264,257L260,253L260,249L264,242L270,240L273,235L281,235L287,222L295,222L298,225L307,224L322,214L326,213L329,203L339,199L345,193L353,189L359,175L364,174L368,170L388,161L389,156L387,153L387,135L390,129L390,125L383,117L384,105L388,97L395,91L395,86L400,82L400,79L407,71L412,68L416,61L422,58L425,52L431,52L436,55L437,54L437,47L433,43L429,34L420,30L415,24L414,11L408,9L405,5L401,5Z' },
+  { id: 'pyeongan', n: '평안도', c: '#dfe5a8', lx: 148, ly: 215, fs: 15, gw: '평양', bu: '평양', d: 'M230,94L218,99L212,104L206,123L198,130L193,139L185,145L176,159L161,161L154,169L149,170L142,176L132,177L124,181L116,189L104,195L99,201L89,207L82,216L82,221L78,232L85,239L92,242L96,251L100,250L103,246L107,246L109,248L109,258L111,257L111,253L113,251L117,251L121,256L128,256L136,261L136,268L139,272L139,279L132,287L131,292L123,306L122,317L124,319L130,321L143,320L147,324L149,324L150,316L153,313L159,313L165,315L170,321L176,324L184,318L183,307L185,305L192,305L197,308L200,307L201,296L204,293L218,292L225,297L230,297L235,290L227,283L226,280L223,280L217,276L216,266L214,263L214,253L218,241L221,238L229,238L231,240L237,238L238,235L236,232L236,226L242,218L238,212L238,206L230,199L230,195L233,190L232,177L228,165L229,153L242,144L249,144L254,137L254,134L260,129L269,126L270,123L262,118L252,118L244,114L241,111L236,97Z' },
+  { id: 'hwanghae', n: '황해도', c: '#f3bdc0', lx: 126, ly: 338, fs: 15, gw: '해주', bu: '', d: 'M232,304L230,300L217,292L206,291L202,295L200,304L198,306L184,302L179,305L180,309L183,312L183,317L178,322L172,322L166,316L159,313L154,313L148,316L148,320L146,322L123,325L114,331L112,338L104,348L104,355L97,361L96,364L107,365L112,368L116,368L118,370L118,374L116,376L113,376L112,379L118,383L125,383L131,389L132,395L146,390L148,388L148,385L155,379L159,379L164,387L172,388L177,393L179,393L179,390L182,387L187,387L194,383L194,373L196,371L200,371L202,366L206,362L219,361L224,357L224,354L219,351L213,343L214,329L230,315Z' },
+  { id: 'gangwon', n: '강원도', c: '#b9dfc9', lx: 338, ly: 388, fs: 15, gw: '원주', bu: '', d: 'M212,330L213,341L219,351L224,353L228,357L235,356L242,365L245,365L248,369L254,369L256,371L256,375L263,380L264,386L260,391L262,395L262,402L267,404L274,410L274,440L280,441L286,438L292,438L297,435L302,435L306,441L311,441L314,444L324,445L330,449L341,448L344,446L355,446L361,448L365,443L369,441L369,433L356,415L350,400L340,389L325,367L320,352L315,345L315,341L310,331L309,325L302,323L295,315L291,314L279,302L276,295L267,294L269,310L267,312L264,312L257,318L252,318L248,314L249,303L244,299L239,305L239,311L237,313L232,313Z' },
+  { id: 'gyeonggi', n: '경기도', c: '#e5e0cd', lx: 224, ly: 451, fs: 12, gw: '수원', bu: '개성 · 한성(수도)', d: 'M208,361L200,369L196,369L194,371L193,381L195,388L193,390L185,391L187,397L191,398L193,400L193,404L198,408L198,412L194,414L193,417L204,417L206,419L206,428L204,430L197,431L208,436L211,444L221,457L225,458L228,456L239,455L245,458L256,449L263,447L270,441L275,430L277,410L262,403L261,390L265,386L265,381L257,375L254,369L243,366L235,356L225,357L219,361Z' },
+  { id: 'chungcheong', n: '충청도', c: '#cea7bf', lx: 236, ly: 486, fs: 15, gw: '충주', bu: '', d: 'M324,447L316,446L305,436L292,436L286,434L282,440L272,439L262,448L256,449L251,455L247,457L243,457L237,454L230,457L218,458L213,452L206,451L199,447L195,450L192,450L189,457L182,458L178,463L177,468L185,474L189,492L198,496L200,515L205,519L208,525L217,523L222,516L228,516L233,521L237,519L247,519L250,524L255,527L260,527L262,525L275,525L283,523L286,520L287,513L290,510L288,507L284,507L281,504L281,490L284,475L286,473L290,473L291,469L296,466L313,466L315,463L315,456L321,452Z' },
+  { id: 'gyeongsang', n: '경상도', c: '#f8cc89', lx: 330, ly: 578, fs: 15, gw: '상주', bu: '경주', d: 'M368,441L361,446L335,446L332,448L324,449L321,454L315,458L312,465L297,465L293,467L288,473L285,473L283,475L283,478L278,482L281,487L281,500L279,505L284,506L287,509L287,517L281,525L280,534L271,540L268,544L264,555L266,570L263,581L265,588L269,592L274,600L274,603L277,606L277,616L280,621L289,622L291,620L291,611L284,610L282,608L282,604L284,602L289,602L292,608L307,607L312,613L313,617L316,614L321,614L323,616L324,622L327,622L332,615L332,605L328,603L324,609L319,609L317,607L317,598L319,596L324,596L327,594L350,596L351,594L362,588L365,579L370,574L372,566L376,563L377,547L384,523L376,522L371,511L371,503L375,492L374,479L377,474L377,469L373,460L373,448Z' },
+  { id: 'jeolla', n: '전라도', c: '#adbad1', lx: 208, ly: 598, fs: 15, gw: '전주', bu: '전주', d: 'M280,525L252,525L246,517L238,520L233,520L230,517L223,515L214,525L208,528L201,529L205,534L209,534L211,536L211,540L209,542L206,542L199,550L196,551L195,563L185,583L185,588L179,593L169,593L170,595L177,595L185,599L185,607L183,610L188,613L188,617L181,621L181,632L171,641L171,646L179,647L187,642L192,642L194,644L194,647L198,651L204,651L207,653L216,652L221,647L225,632L228,628L232,628L234,630L234,643L249,639L251,637L251,634L258,628L269,628L271,630L271,635L273,635L275,627L272,624L273,614L270,611L270,607L274,600L264,586L264,574L267,569L265,565L265,552L267,545L281,532L282,529Z' },
+];
+var PMARK = [['g', 261, 224], ['b', 262, 235], ['g', 169, 301], ['b', 159, 301], ['g', 154, 363], ['b', 207, 380], ['s', 228, 407], ['g', 232, 430], ['g', 288, 423], ['g', 284, 454], ['g', 298, 497], ['g', 225, 546], ['b', 237, 547], ['b', 366, 539]];
+var PCITY = [['함흥', 270, 229, 'start'], ['평양', 156, 290, 'middle'], ['해주', 146, 367, 'end'], ['개성', 215, 384, 'start'], ['한성', 237, 411, 'start'], ['수원', 240, 434, 'start'], ['원주', 296, 427, 'start'], ['충주', 292, 458, 'start'], ['상주', 306, 501, 'start'], ['전주', 231, 567, 'middle'], ['경주', 374, 543, 'start']];
+var provState = { mode: 'browse', sel: null, q: null };
+function provById(id) { return PROV.filter(function (p) { return p.id === id; })[0]; }
+function provSVG() {
+  var st = provState, quiz = st.mode === 'quiz', tg = quiz && st.q && !st.q.done ? st.q.target : null, h = '<svg viewBox="60 0 400 742" class="pmap" role="img" aria-label="조선 8도 지도">';
+  PROV.forEach(function (p) { h += '<path class="pp' + (st.sel === p.id ? ' on' : '') + (tg === p.id ? ' tg' : '') + '" data-id="' + p.id + '" d="' + p.d + '" fill="' + p.c + '"/>'; });
+  h += '<ellipse class="pp' + (st.sel === 'jeolla' ? ' on' : '') + (tg === 'jeolla' ? ' tg' : '') + '" data-id="jeolla" cx="196" cy="721" rx="24" ry="11" fill="' + provById('jeolla').c + '"/>';
+  h += '<polygon points="289,92 283,102 295,102" fill="#14213d"/><text class="pcity" x="289" y="86" text-anchor="middle">백두산</text>';
+  if (!quiz) {
+    PROV.forEach(function (p) { h += '<text class="pname" x="' + p.lx + '" y="' + p.ly + '" text-anchor="middle" style="font-size:' + p.fs + 'px">' + p.n + '</text>'; });
+    PCITY.forEach(function (c) { h += '<text class="pcity" x="' + c[1] + '" y="' + c[2] + '" text-anchor="' + c[3] + '">' + c[0] + '</text>'; });
+  }
+  PMARK.forEach(function (m) {
+    if (m[0] === 'g') h += '<circle cx="' + m[1] + '" cy="' + m[2] + '" r="5.5" fill="#d4146a" stroke="#fff" stroke-width="1.5" pointer-events="none"/>';
+    else if (m[0] === 'b') h += '<circle cx="' + m[1] + '" cy="' + m[2] + '" r="5.5" fill="#fff" stroke="#14213d" stroke-width="1.8" pointer-events="none"/><circle cx="' + m[1] + '" cy="' + m[2] + '" r="1.8" fill="#14213d" pointer-events="none"/>';
+    else h += '<rect x="' + (m[1] - 5.5) + '" y="' + (m[2] - 5.5) + '" width="11" height="11" fill="#fff" stroke="#14213d" stroke-width="1.8" pointer-events="none"/><rect x="' + (m[1] - 2.5) + '" y="' + (m[2] - 2.5) + '" width="5" height="5" fill="#14213d" pointer-events="none"/>';
+  });
+  return h + '</svg>';
+}
+function provPanel() {
+  var st = provState, h = '<div class="plegend"><span><b style="color:#d4146a">●</b> 관찰사 파견지(감영)</span><span><b>◎</b> 부</span><span><b>■</b> 한성(수도)</span></div>';
+  if (st.mode === 'browse') {
+    if (st.sel) { var p = provById(st.sel); h += '<h3>' + p.n + '</h3><p>● 관찰사 파견지: <b>' + p.gw + '</b></p><p>◎ 부: <b>' + (p.bu || '표시된 곳 없음') + '</b></p>'; }
+    else h += '<h3>지도에서 도를 눌러 보세요</h3><p>도마다 관찰사가 파견된 곳(감영)과 부의 위치를 알 수 있어요.</p>';
+    h += '<p class="ptip">조선은 전국을 8도로 나누고 도마다 관찰사를 파견했다. 도 아래 부·목·군·현에는 수령을 보냈다.</p><div class="crow" style="justify-content:flex-start"><button class="cbtn" id="pQuiz" style="background:#3b6fa8">🎯 도 이름 맞히기</button></div>';
+  } else {
+    var q = st.q;
+    if (q.done) {
+      h += '<h3>결과: ' + q.right + ' / 8</h3><p>' + (q.right >= 7 ? '훌륭해요! 8도의 위치를 거의 다 알고 있어요.' : '조금 더 연습해 볼까요?') + (q.reward ? '<br>🪙 엽전 +' + q.reward : '') + '</p><div class="crow" style="justify-content:flex-start"><button class="cbtn" id="pQuiz" style="background:#3b6fa8">다시 도전</button><button class="cbtn" id="pBrowse">지도 보기</button></div>';
+    } else {
+      h += '<h3>문제 ' + (q.i + 1) + ' / 8</h3><p>반짝이는 곳은 어느 도일까요?</p><div class="pbtns">';
+      PROV.forEach(function (p) { var c = q.ans ? (p.id === q.target ? ' ok' : (p.id === q.ans ? ' bad' : '')) : ''; h += '<button class="pbtn' + c + '" data-ans="' + p.id + '"' + (q.ans ? ' disabled' : '') + '>' + p.n + '</button>'; });
+      h += '</div>';
+      if (q.ans) { var t = provById(q.target); h += '<p class="pfb">' + (q.ans === q.target ? '⭕ 정답!' : '❌ 정답은 ' + t.n) + ' — 관찰사 ' + t.gw + (t.bu ? ', 부 ' + t.bu : '') + '</p><div class="crow" style="justify-content:flex-start"><button class="cbtn" id="pNext">' + (q.i === 7 ? '결과 보기' : '다음 ▶') + '</button></div>'; }
+    }
+  }
+  return h;
+}
+function renderProv() {
+  $('pcard').innerHTML = '<h2>🗺 조선의 8도와 지방 행정</h2><div class="pgrid"><div class="pmapbox">' + provSVG() + '</div><div class="ppanel">' + provPanel() + '</div></div><div class="crow"><button class="cbtn" id="pClose">닫기 (Esc)</button></div>';
+  $('pClose').onclick = closeProv;
+}
+function openProv() { S.sign = true; provState = { mode: 'browse', sel: null, q: null }; setMode('prov'); renderProv(); $('prov').classList.remove('hide'); }
+function closeProv() { $('prov').classList.add('hide'); setMode('play'); save(); }
+function startProvQuiz() { var ids = shuf(PROV.map(function (p) { return p.id; })); provState = { mode: 'quiz', sel: null, q: { order: ids, i: 0, right: 0, target: ids[0], ans: null, done: false, reward: 0 } }; renderProv(); }
+function openJournal() {
+  setMode('journal');
+  var n = stampCount(), h = '<h2>📖 학습지 도감</h2><p>도장을 받으면 내용이 채워져요. (' + n + ' / ' + TOTAL + ')</p><div class="bar0"><i style="width:' + (n / TOTAL * 100) + '%"></i></div><div class="jgrid">';
+  ZONES.forEach(function (z, zi) {
+    var list = NPCS.filter(function (a) { return a.z === zi; }), got = list.filter(function (a) { return S.stamps[a.id]; }).length;
+    h += '<div class="jz"><h3>' + z.s + ' <small>(' + got + '/' + list.length + ')</small></h3><ul>' + list.map(function (a) { return S.stamps[a.id] ? '<li><b>' + a.name + '</b> — ' + a.sum + '</li>' : '<li class="lock">🔒 ???</li>'; }).join('') + (zi === 1 ? (S.bond ? '<li><b>수령 ↔ 향리</b> — 수령이 고을을 다스리고, 향리가 수령 아래에서 행정 실무를 맡아 도움</li>' : '<li class="lock">🔒 수령과 향리의 관계 (두 사람을 모두 만나면)</li>') : '') + (zi === 0 ? (S.samsa ? '<li><b>3사</b> — 사헌부·사간원·홍문관, 언론 기능으로 왕과 관리를 견제</li>' : '<li class="lock">🔒 3사 (세 관청을 모두 만나면)</li>') : '') + '</ul></div>';
+  });
+  h += '</div><div class="crow"><button class="cbtn" id="jClose">닫기 (J)</button></div>';
+  $('jcard').innerHTML = h; $('journal').classList.remove('hide'); $('jClose').onclick = closeJournal;
+}
+function closeJournal() { $('journal').classList.add('hide'); setMode('play'); }
+function openMap() {
+  setMode('map'); var c = $('mm').getContext('2d'); c.imageSmoothingEnabled = false; c.clearRect(0, 0, 640, 480);
+  c.drawImage(mapCv, 0, 0, 640, 480); var k = 640 / (MW * T);
+  ZONES.forEach(function (z, i) {
+    var cx = (z.r[0] + z.r[2] / 2) * T * k, cy = (z.r[1] + z.r[3] / 2) * T * k;
+    c.font = '700 15px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.fillStyle = 'rgba(20,24,36,.8)'; c.fillRect(cx - 62, cy - 24, 124, 38);
+    c.fillStyle = '#fff'; c.fillText(z.n, cx, cy - 6); c.font = '12px "Noto Sans KR", sans-serif'; c.fillText('학습지 ' + z.s.slice(0, 3), cx, cy + 9);
+  });
+  NPCS.forEach(function (a) { c.fillStyle = S.stamps[a.id] ? '#3ccf7b' : '#ffdf4a'; c.beginPath(); c.arc(a.px * k, a.py * k, 3.5, 0, 7); c.fill(); });
+  ALL.filter(function (a) { return a.type !== 'lesson'; }).forEach(function (a) { c.fillStyle = '#ff7a6b'; c.beginPath(); c.arc(a.px * k, a.py * k, 4.5, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 11px sans-serif'; c.fillText(a.label, a.px * k, a.py * k - 7); });
+  c.fillStyle = '#3b8bff'; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.arc(P.x * k, P.y * k, 6, 0, 7); c.fill(); c.stroke();
+  $('mapov').classList.remove('hide');
+}
+function closeMap() { $('mapov').classList.add('hide'); setMode('play'); }
+function showEnding(wrong, zEnd) {
+  var rank = S.wrongs <= 4 ? '영의정' : S.wrongs <= 10 ? '판서' : S.wrongs <= 20 ? '고을 수령' : '견습 서기';
+  $('ecard').innerHTML = '<div class="cert"><h2>🎉 임 명 장 🎉</h2><div class="big">' + S.name.replace(/[<>&]/g, '') + ' 을(를)<br>조선의 <span style="color:var(--accent)">' + rank + '</span>에 임명하노라</div><p>학습지 도장 ' + stampCount() + '/' + TOTAL + ' · 엽전 ' + S.coins + '냥 · 틀린 횟수 ' + S.wrongs + '번' + (zEnd ? ' · 구한 사람 ' + S.cured + '명' : '') + '</p>' + (zEnd ? '<p style="font-weight:900;color:var(--accent)">그대 덕분에 조선이 좀비의 위험에서 벗어났도다!</p>' : '') + '<p>중앙 정치 · 지방 행정 · 군사/교통/통신 · 관리 등용/교육<br>조선의 통치 체제를 모두 익혔다!</p></div><div class="crow"><button class="cbtn" id="eJ" style="background:#3b6fa8">학습지 보기</button><button class="cbtn" id="eC">계속 탐험하기</button></div>';
+  $('ending').classList.remove('hide'); setMode('ending'); sfx.fanBig();
+  for (var i = 0; i < 36; i++) { (function (i) { var s = document.createElement('span'); s.className = 'conf'; s.textContent = ['🎉', '🪙', '📜', '✨'][i % 4]; s.style.left = Math.random() * 100 + 'vw'; s.style.animationDuration = (2.5 + Math.random() * 2.5) + 's'; s.style.animationDelay = Math.random() * 1.2 + 's'; document.body.appendChild(s); setTimeout(function () { s.remove(); }, 7000); })(i); }
+  $('eC').onclick = function () { $('ending').classList.add('hide'); setMode('play'); hud(); if (zEnd) toast('🌅 날이 밝았다! 조선에 다시 평화가 찾아왔다.'); };
+  $('eJ').onclick = function () { $('ending').classList.add('hide'); openJournal(); };
+}
+
+/* ---------- input ---------- */
+function action() {
+  if (mode === 'play') { if (near) interact(near); }
+  else if (mode === 'dialog') advance();
+  else if (mode === 'mini') { if (miniAct) miniAct(); }
+}
+window.addEventListener('keydown', function (e) {
+  var tag = e.target && e.target.tagName;
+  if (tag === 'INPUT') { if (e.key === 'Enter') $('bNew').click(); return; }
+  var k = e.key.toLowerCase();
+  if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].indexOf(k) >= 0) e.preventDefault();
+  if (k === 'shift' || k === 'w' || k === 'a' || k === 's' || k === 'd' || k.indexOf('arrow') === 0) keys[k] = true;
+  if (e.repeat) return;
+  ac();
+  if (mode === 'play') {
+    if (k === 'e' || k === ' ' || k === 'enter') action();
+    else if (k === 'j') openJournal(); else if (k === 'm') openMap(); else if (k === 'r') runToggle = !runToggle;
+  } else if (mode === 'dialog') {
+    if (k === 'e' || k === ' ' || k === 'enter') advance();
+    else if (k >= '1' && k <= '4') {
+      var i = +k - 1;
+      if (dlg.mode === 'quiz' && dlg.pick) dlg.pick(i);
+      else if (dlg.mode === 'choices' && dlg.btns[i]) { sfx.ui(); dlg.btns[i].fn(); }
+    } else if (k === 'escape' && dlg.mode !== 'quiz') closeDlg();
+  } else if (mode === 'zq') {
+    if (k === '1' || k === '2') answerZQ(+k - 1);
+  } else if (mode === 'mini') {
+    if (k === 'e' || k === ' ' || k === 'enter') { if (miniAct) miniAct(); } else if (k === 'escape') closeMini();
+  } else if (mode === 'prov') { if (k === 'escape') closeProv(); }
+  else if (mode === 'journal') { if (k === 'j' || k === 'escape') closeJournal(); }
+  else if (mode === 'map') { if (k === 'm' || k === 'escape') closeMap(); }
+});
+$('pcard').addEventListener('click', function (e) {
+  var t = e.target.closest('[data-id],[data-ans],#pQuiz,#pBrowse,#pNext'); if (!t) return;
+  if (t.id === 'pQuiz') { sfx.ui(); startProvQuiz(); return; }
+  if (t.id === 'pBrowse') { provState = { mode: 'browse', sel: null, q: null }; renderProv(); return; }
+  if (t.id === 'pNext') {
+    var q = provState.q; q.i++;
+    if (q.i >= 8) { q.done = true; if (q.right >= 7) { q.reward = rewardMini('prov8', 4); sfx.win(); } else sfx.ok(); }
+    else { q.target = q.order[q.i]; q.ans = null; }
+    renderProv(); return;
+  }
+  if (t.getAttribute('data-ans')) { var q2 = provState.q; if (q2.ans) return; q2.ans = t.getAttribute('data-ans'); if (q2.ans === q2.target) { q2.right++; sfx.ok(); } else sfx.no(); renderProv(); return; }
+  if (t.getAttribute('data-id') && provState.mode === 'browse') { provState.sel = t.getAttribute('data-id'); sfx.ui(); renderProv(); }
+});
+window.addEventListener('keyup', function (e) { keys[e.key.toLowerCase()] = false; });
+window.addEventListener('blur', function () { keys = {}; });
+function tapKeys(el, k) {
+  var on = function (e) { e.preventDefault(); keys[k] = true; }, off = function (e) { e.preventDefault(); keys[k] = false; };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
+}
+Array.prototype.forEach.call(document.querySelectorAll('.dp button'), function (b) { tapKeys(b, b.getAttribute('data-k')); });
+$('tAct').addEventListener('click', function () { ac(); action(); });
+$('tRun').addEventListener('click', function () { runToggle = !runToggle; this.style.background = runToggle ? 'var(--gold)' : ''; this.style.color = runToggle ? '#222' : ''; });
+$('dnext').addEventListener('click', function () { ac(); advance(); });
+$('bJ').addEventListener('click', function () { if (mode === 'play') openJournal(); else if (mode === 'journal') closeJournal(); });
+$('bM').addEventListener('click', function () { if (mode === 'play') openMap(); else if (mode === 'map') closeMap(); });
+$('mapClose').addEventListener('click', closeMap);
+$('bZ').addEventListener('click', function () { S.zoff = !S.zoff; if (S.zoff) { ZOMB = []; zRespawn = []; danger = 0; } hud(); save(); toast(S.zoff ? '좀비 모드를 껐어요' : '🧟 좀비 모드를 켰어요. 길을 조심하세요!'); });
+$('bS').addEventListener('click', function () { muted = !muted; this.textContent = muted ? '🔇' : '🔊'; });
+window.addEventListener('touchstart', function () { $('pad').classList.remove('hide'); }, { once: true, passive: true });
+try { if (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) $('pad').classList.remove('hide'); } catch (e) {}
+
+/* ---------- start ---------- */
+function begin(isNew) {
+  $('title').classList.add('hide'); $('hud').classList.remove('hide'); $('keyhint').classList.remove('hide');
+  setTimeout(function () { $('keyhint').style.opacity = 0; }, 14000);
+  if (S.x && S.y && !isNew) { P.x = S.x; P.y = S.y; if (!canStand(P.x, P.y)) { P.x = 31.5 * T; P.y = 20.5 * T; } } else { P.x = 31.5 * T; P.y = 20.5 * T; }
+  S.zoff = !$('zIn').checked; ZOMB = []; zRespawn = []; ZFX = []; invul = 3; if (!(S.hp > 0)) S.hp = 3;
+  syncGate(); syncShip(); hud(); setMode('play'); curZone = -2; ac();
+  if (!S.intro) goblin(true);
+  else toast('어서 와요, ' + S.name + '! 모험을 이어가 볼까요?');
+}
+function startNew() {
+  var nm = ($('nameIn').value || '').trim() || '학생';
+  S = freshSave(); S.name = nm; save(); begin(true);
+}
+var old = loadSave();
+if (old && (stampCountOf(old) > 0 || old.coins > 0 || old.intro)) { $('bCont').classList.remove('hide'); $('nameIn').value = old.name || ''; $('zIn').checked = !old.zoff; }
+function stampCountOf(o) { var n = 0; for (var k in o.stamps) n++; return n; }
+var armed = false;
+$('bNew').addEventListener('click', function () {
+  if (old && !$('bCont').classList.contains('hide') && !armed) { armed = true; this.textContent = '저장이 사라져요! 한 번 더 누르면 시작'; return; }
+  startNew();
+});
+$('bCont').addEventListener('click', function () { S = old; begin(false); });
+S = freshSave();
+requestAnimationFrame(function (t) { last = t; requestAnimationFrame(frame); });
+window.__game = { zq: { start: function (z) { startZQ(z); }, answer: function (i) { answerZQ(i); }, list: function () { return ZOMB; }, wild: WILD }, solid: function (x, y) { return !!SOLID[map[y][x]] || !!blk[y * MW + x]; }, tile: function (x, y) { return map[y][x]; }, POOL: FINAL_POOL, ALL: ALL, NPCS: NPCS, interact: interact, P: P, S: function () { return S; }, setPos: function (x, y) { P.x = x; P.y = y; } };
+})();
+</script>
+</body>
+</html>
