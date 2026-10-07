@@ -174,6 +174,32 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 .mcard.done.term { font-size: clamp(16px, 2vw, 22px); font-weight: 900; }
 .mcard.miss { animation: shake .35s; }
 @media (max-width: 760px) { .mgrid { grid-template-columns: repeat(3, 1fr); } }
+#cine { position: fixed; inset: 0; z-index: 45; background: #000; opacity: 0; transition: opacity .7s; overflow: hidden; }
+#cine.show { opacity: 1; }
+#cine .cbar { display: none; }
+.cscene { position: absolute; left: 0; right: 0; top: 6vh; bottom: 112px; overflow: hidden; }
+.cbg { position: absolute; inset: 0; width: 100%; height: 100%; animation: czoom 9s ease-out forwards; }
+@keyframes czoom { from { transform: scale(1.1); } to { transform: scale(1); } }
+.chero { position: absolute; left: 50%; bottom: -4%; height: 100%; transform: translateX(-50%); filter: drop-shadow(0 12px 22px rgba(0,0,0,.5)); animation: crise 1.4s ease-out; }
+@keyframes crise { from { opacity: 0; transform: translate(-50%, 8%); } to { opacity: 1; transform: translate(-50%, 0); } }
+.cbreath { animation: cbr 4s ease-in-out infinite; transform-origin: 200px 700px; }
+@keyframes cbr { 50% { transform: scale(1.006, 1.012); } }
+.chead { animation: chd 4s ease-in-out infinite; transform-origin: 200px 240px; }
+@keyframes chd { 50% { transform: translateY(-2px) rotate(-.7deg); } }
+.cplume { animation: cpl 2.4s ease-in-out infinite; transform-origin: 200px 60px; }
+@keyframes cpl { 50% { transform: rotate(5deg); } }
+.cwaves { animation: cwv 5s linear infinite alternate; }
+@keyframes cwv { to { transform: translateX(34px); } }
+.cpanel { position: absolute; left: 50%; transform: translateX(-50%); bottom: 124px; width: min(860px, 92vw); background: rgba(18,14,10,.88); border: 2px solid #b89a5a; border-radius: 10px; padding: 12px 18px 14px 78px; color: #f3ead8; box-shadow: 0 6px 30px rgba(0,0,0,.6); }
+.cemb { position: absolute; left: 10px; top: -16px; width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #4fbf6a, #1c6b38); border: 3px solid #e6be5a; display: grid; place-items: center; font-size: 28px; box-shadow: 0 3px 10px rgba(0,0,0,.5); }
+.chead2 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-weight: 900; font-size: clamp(17px, 2vw, 22px); margin-bottom: 6px; }
+.cn-c { color: #ff9e4a; } .cn-t { color: #f3ead8; } .cn-n { color: #7fe08a; }
+.cstat { color: #ffcf6a; font-size: 15px; white-space: nowrap; }
+.ctext { font-size: clamp(16px, 1.9vw, 21px); line-height: 1.6; min-height: 3.4em; word-break: keep-all; }
+.copts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; width: min(640px, 88vw); display: flex; flex-direction: column; gap: 8px; }
+.copts button { background: linear-gradient(#5d7c93, #2f4a5e); color: #fff; border: 2px solid #9fc0d6; border-radius: 8px; padding: 7px 14px; font-weight: 700; font-size: clamp(15px, 1.8vw, 19px); }
+.copts button:hover { filter: brightness(1.2); }
+@media (prefers-reduced-motion: reduce) { .cbg, .chero, .cbreath, .chead, .cplume, .cwaves { animation: none !important; } }
 @media (max-width: 760px) { .pgrid { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .jgrid { grid-template-columns: 1fr; } .dopts { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .shake, .conf { animation: none !important; } }
@@ -240,6 +266,102 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 <div id="mini" class="ov hide"><div class="card mc"><h2 id="mTitle"></h2><p id="mDesc"></p><div id="mBody"></div><div class="msg" id="mRes"></div><div class="crow" style="justify-content:center" id="mBtns"></div></div></div>
 <div id="zq" class="ov hide"><div class="card"><h2 id="zqT">🧟 좀비에게 붙잡혔다!</h2><p id="zqS">8초 안에 정답을 외쳐 정신을 되찾게 하라!</p><p id="zqQ"></p><div class="zbar"><i id="zqBar"></i></div><div class="zopts" id="zqO"></div><div class="msg" id="zqR"></div></div></div>
 <div id="flash"></div>
+<div id="cine" class="hide" aria-live="polite">
+  <div class="cbar"></div>
+  <div class="cscene" id="cscene">
+    <svg class="cbg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="csky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e2a52"/><stop offset=".45" stop-color="#8d6c8f"/><stop offset=".8" stop-color="#e3a98a"/><stop offset="1" stop-color="#f6d2a8"/></linearGradient>
+        <linearGradient id="csea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f7fb3"/><stop offset=".5" stop-color="#46578f"/><stop offset="1" stop-color="#27355f"/></linearGradient>
+        <radialGradient id="csun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3d1" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd59a" stop-opacity=".55"/><stop offset="1" stop-color="#ffb47a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="csand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2c193"/><stop offset="1" stop-color="#b98f5c"/></linearGradient>
+        <linearGradient id="crock" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b2a22"/><stop offset=".6" stop-color="#6b4a35"/><stop offset="1" stop-color="#8a6448"/></linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#csky)"/>
+      <circle cx="1120" cy="400" r="220" fill="url(#csun)"/>
+      <circle cx="1120" cy="410" r="46" fill="#fff1cf" opacity=".9"/>
+      <path d="M380 470 L520 330 L610 380 L720 290 L860 400 L980 350 L1120 430 L1260 360 L1400 420 L1600 380 L1600 470 Z" fill="#8a7aa6" opacity=".75"/>
+      <path d="M300 480 L470 400 L600 445 L760 380 L900 455 L1060 420 L1230 470 L1420 440 L1600 470 L1600 485 L300 485 Z" fill="#6c6390" opacity=".85"/>
+      <rect y="470" width="1600" height="430" fill="url(#csea)"/>
+      <path d="M1060 470 L1180 470 L1230 900 L1010 900 Z" fill="#ffe2b0" opacity=".18"/>
+      <g class="cwaves" stroke="#dfe7ff" stroke-width="3" stroke-linecap="round" opacity=".5">
+        <path d="M520 560 h70 M760 600 h50 M1000 540 h80 M1250 620 h60 M640 680 h90 M1380 560 h50 M900 720 h70"/>
+      </g>
+      <g transform="translate(1290 548) scale(.9)">
+        <path d="M-60 0 Q-55 14 -35 14 L40 14 Q58 12 62 0 Z" fill="#2a1b10"/>
+        <path d="M-52 0 Q-38 -30 0 -32 Q38 -30 54 0 Z" fill="#3c4436"/>
+        <path d="M-30 -24 l3 -9 l3 9 M-10 -30 l3 -9 l3 9 M12 -30 l3 -9 l3 9 M32 -22 l3 -9 l3 9" stroke="#d9d3c2" stroke-width="2" fill="none"/>
+        <path d="M54 0 L62 -12 L78 -14 L84 -6 L72 -2 L80 4 L60 8 Z" fill="#a8322a"/>
+        <path d="M-44 -26 v-30" stroke="#2a1b10" stroke-width="3"/><path d="M-44 -56 l22 4 l-22 9 Z" fill="#c0392b"/>
+        <path d="M-40 14 l-6 16 M-20 14 l-6 16 M0 14 l-6 16 M20 14 l-6 16 M38 14 l-6 16" stroke="#2a1b10" stroke-width="3"/>
+      </g>
+      <path d="M0 700 Q300 610 640 660 Q900 700 1200 650 Q1420 620 1600 640 L1600 900 L0 900 Z" fill="url(#csand)"/>
+      <path d="M0 0 L250 0 Q300 120 270 240 Q330 330 300 430 Q380 520 330 640 Q260 700 120 720 L0 730 Z" fill="url(#crock)"/>
+      <path d="M180 60 Q220 170 200 280 M240 300 Q270 380 250 470" stroke="#2b1d16" stroke-width="10" fill="none" opacity=".5"/>
+      <g stroke="#c9a24a" stroke-width="4" stroke-linecap="round" opacity=".9" id="cgrass"></g>
+    </svg>
+    <svg class="chero" viewBox="0 0 400 700" aria-hidden="true">
+      <defs>
+        <pattern id="cstud" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="3" fill="#e6be5a"/><circle cx="10" cy="10" r="1.2" fill="#fff4c4"/></pattern>
+        <linearGradient id="carmor" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e1712"/><stop offset=".5" stop-color="#a8291f"/><stop offset="1" stop-color="#6e1712"/></linearGradient>
+        <linearGradient id="chelm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c2027"/><stop offset=".45" stop-color="#4a5260"/><stop offset="1" stop-color="#1c2027"/></linearGradient>
+        <linearGradient id="cskin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98f62"/><stop offset=".5" stop-color="#e2ad80"/><stop offset="1" stop-color="#c48a5d"/></linearGradient>
+      </defs>
+      <g class="cbreath">
+        <path d="M125 255 Q90 470 80 700 L320 700 Q310 470 275 255 Z" fill="#1f2b4a"/>
+        <path d="M118 250 Q70 480 60 700 L190 700 L196 300 Z" fill="url(#carmor)"/>
+        <path d="M282 250 Q330 480 340 700 L210 700 L204 300 Z" fill="url(#carmor)"/>
+        <path d="M118 250 Q70 480 60 700 L190 700 L196 300 Z" fill="url(#cstud)" opacity=".85"/>
+        <path d="M282 250 Q330 480 340 700 L210 700 L204 300 Z" fill="url(#cstud)" opacity=".85"/>
+        <path d="M196 300 L190 700 M204 300 L210 700" stroke="#e6be5a" stroke-width="6"/>
+        <path d="M160 238 L200 300 L240 238" fill="#f3efe4" stroke="#d9d0bb" stroke-width="2"/>
+        <rect x="98" y="420" width="204" height="30" rx="6" fill="#2a1b10"/>
+        <rect x="186" y="418" width="28" height="34" rx="4" fill="#e6be5a"/>
+        <path d="M262 440 L338 640" stroke="#16100b" stroke-width="16" stroke-linecap="round"/>
+        <path d="M268 455 L280 487 M300 540 L312 572" stroke="#e6be5a" stroke-width="18"/>
+        <path d="M246 404 L262 440" stroke="#3a2a1a" stroke-width="10" stroke-linecap="round"/>
+        <rect x="236" y="396" width="34" height="8" rx="3" fill="#e6be5a" transform="rotate(-24 253 400)"/>
+        <path d="M100 262 Q72 330 82 430 Q100 460 126 440 Q120 350 140 290 Z" fill="url(#carmor)"/>
+        <path d="M100 262 Q72 330 82 430 Q100 460 126 440 Q120 350 140 290 Z" fill="url(#cstud)" opacity=".7"/>
+        <ellipse cx="104" cy="450" rx="18" ry="16" fill="url(#cskin)"/>
+        <path d="M300 262 Q330 320 300 380 Q280 410 250 405 Q262 360 262 300 Z" fill="url(#carmor)"/>
+        <path d="M300 262 Q330 320 300 380 Q280 410 250 405 Q262 360 262 300 Z" fill="url(#cstud)" opacity=".7"/>
+        <ellipse cx="252" cy="404" rx="17" ry="15" fill="url(#cskin)"/>
+        <path d="M88 248 Q130 222 168 236 L160 296 Q120 300 92 292 Z" fill="#7d1b14" stroke="#e6be5a" stroke-width="4"/>
+        <path d="M312 248 Q270 222 232 236 L240 296 Q280 300 308 292 Z" fill="#7d1b14" stroke="#e6be5a" stroke-width="4"/>
+      </g>
+      <g class="chead">
+        <rect x="184" y="196" width="32" height="44" fill="#c48a5d"/>
+        <path d="M146 150 Q138 210 150 236 L176 240 L176 156 Z" fill="#26324f"/>
+        <path d="M254 150 Q262 210 250 236 L224 240 L224 156 Z" fill="#26324f"/>
+        <path d="M147 170 l9 0 M147 190 l10 0 M149 210 l10 0 M253 170 l-9 0 M253 190 l-10 0 M251 210 l-10 0" stroke="#e6be5a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="200" cy="176" rx="40" ry="50" fill="url(#cskin)"/>
+        <ellipse cx="160" cy="180" rx="7" ry="12" fill="#c48a5d"/><ellipse cx="240" cy="180" rx="7" ry="12" fill="#c48a5d"/>
+        <path d="M172 160 Q182 152 194 158" stroke="#1a1410" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M206 158 Q218 152 228 160" stroke="#1a1410" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="184" cy="173" rx="8.5" ry="4.2" fill="#fbf4e8"/><circle cx="185" cy="173" r="3.3" fill="#1a1410"/><path d="M175 171 Q184 166 193 171" stroke="#1a1410" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="216" cy="173" rx="8.5" ry="4.2" fill="#fbf4e8"/><circle cx="215" cy="173" r="3.3" fill="#1a1410"/><path d="M207 171 Q216 166 225 171" stroke="#1a1410" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M200 176 L196 196 L203 198" stroke="#a5704a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M176 210 Q188 202 200 206 Q212 202 224 210 Q214 214 200 211 Q186 214 176 210 Z" fill="#17120e"/>
+        <path d="M186 216 Q200 222 214 216 Q212 252 200 262 Q188 252 186 216 Z" fill="#17120e"/>
+        <path d="M152 156 Q152 92 200 86 Q248 92 248 156 Z" fill="url(#chelm)"/>
+        <rect x="146" y="146" width="108" height="14" rx="5" fill="#e6be5a"/>
+        <path d="M156 140 Q200 128 244 140" stroke="#e6be5a" stroke-width="3" fill="none"/>
+        <path d="M200 86 L200 58" stroke="#e6be5a" stroke-width="7"/>
+        <circle cx="200" cy="56" r="7" fill="#e6be5a"/>
+        <g class="cplume"><path d="M200 60 Q172 66 168 108 Q186 86 200 84 Q214 86 232 108 Q228 66 200 60 Z" fill="#c0261d"/><path d="M200 60 Q186 74 182 100 M200 60 Q214 74 218 100" stroke="#e0473c" stroke-width="3" fill="none"/></g>
+      </g>
+    </svg>
+  </div>
+  <div class="cpanel">
+    <div class="cemb">⚓</div>
+    <div class="chead2"><span id="cName"></span><span class="cstat" id="cStat"></span></div>
+    <div class="ctext" id="cText"></div>
+  </div>
+  <div class="copts" id="cOpts"></div>
+  <div class="cbar cbar2"></div>
+</div>
+
 <div id="ending" class="ov hide"><div class="card" id="ecard"></div></div>
 
 <script>
@@ -294,7 +416,7 @@ function burst(n) {
 /* ---------- save ---------- */
 var KEY = 'joseon-rpg-v1';
 var S = null;
-function freshSave() { return { name: '학생', coins: 0, hints: 0, stamps: {}, got: {}, chests: {}, wrongs: 0, streak: 0, minis: {}, x: 0, y: 0, done: false, intro: false, samsa: false, sign: false, bond: false, part: {}, hp: 3, zoff: false, cured: 0 }; }
+function freshSave() { return { name: '학생', coins: 0, hints: 0, stamps: {}, got: {}, chests: {}, wrongs: 0, streak: 0, minis: {}, x: 0, y: 0, done: false, intro: false, samsa: false, sign: false, bond: false, metHero: false, part: {}, hp: 3, zoff: false, cured: 0 }; }
 function save() { try { if (S) { S.x = P.x; S.y = P.y; localStorage.setItem(KEY, JSON.stringify(S)); } } catch (e) {} }
 function loadSave() { try { var r = localStorage.getItem(KEY); if (!r) return null; var o = JSON.parse(r); var f = freshSave(); for (var k in f) if (!(k in o)) o[k] = f[k]; return o; } catch (e) { return null; } }
 
@@ -457,11 +579,13 @@ var SPECIAL = [
   { id: 'goblin', type: 'goblin', tx: 28, ty: 20, label: '도깨비', look: { robe: '#4aa36a', hat: 'horn' } },
   { id: 'shop', type: 'shop', tx: 28, ty: 26, label: '보부상', look: { robe: '#c0773a', hat: 'gat' } },
   { id: 'sign8', type: 'sign', tx: 52, ty: 16, label: '8도 안내판', look: {} },
-  { id: 'king', type: 'king', tx: 31, ty: 8, label: '임금님', look: { robe: '#c0392b', hat: 'crown' } }
+  { id: 'king', type: 'king', tx: 31, ty: 8, label: '임금님', look: { robe: '#c0392b', hat: 'crown' } },
+  { id: 'hero', type: 'hero', tx: 11, ty: 40, label: '이순신', look: { robe: '#7a1f1f', hat: 'helm' }, cond: function () { return !!(S && S.stamps.sugun); } }
 ];
 var ALL = NPCS.concat(SPECIAL);
 ALL.forEach(function (n) { blk[n.ty * MW + n.tx] = 1; n.px = (n.tx + .5) * T; n.py = (n.ty + .5) * T; });
 blk[9 * MW + 57] = 1;
+blk[40 * MW + 11] = 0;
 for (var by = 8; by <= 11; by++) { blk[by * MW + 28] = 1; blk[by * MW + 34] = 1; }
 [[37, 28], [39, 28], [41, 28], [42, 28], [44, 28], [46, 28], [48, 28]].forEach(function (p) { blk[p[1] * MW + p[0]] = 1; });
 
@@ -627,6 +751,7 @@ function update(dt) {
   anim += dt; if (beaconBoost > 0) beaconBoost -= dt;
   if (mode === 'zq') tickZQ(dt);
   if (mode !== 'play') { P.moving = false; return; }
+  if (pendingHero && shipP >= 1) { pendingHero = false; heroCine(); return; }
   updateZombies(dt);
   if (S.stamps.sugun && shipP < 1) shipP = Math.min(1, shipP + dt / 2.5);
   var mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
@@ -671,7 +796,7 @@ function update(dt) {
   if (!gateOpen && Math.hypot(44.5 * T - P.x, 11 * T - P.y) < 2.2 * T && anim - lockMsgT > 8) { lockMsgT = anim; toast('🔒 동문이 굳게 잠겨 있다. 궁궐 관청의 문제를 모두 풀면 열릴 것 같다.'); }
   // 가까운 NPC
   var best = null, bd = 1.8 * T;
-  ALL.forEach(function (a) { var d = Math.hypot(a.px - P.x, a.py - P.y); if (d < bd) { bd = d; best = a; } });
+  ALL.forEach(function (a) { if (a.cond && !a.cond()) return; var d = Math.hypot(a.px - P.x, a.py - P.y); if (d < bd) { bd = d; best = a; } });
   if (best !== near) {
     near = best;
     var pr = $('prompt');
@@ -770,7 +895,7 @@ function draw() {
   });
   // 개체
   var ents = [];
-  ALL.forEach(function (a) { ents.push({ y: a.py, d: function () { drawNpc(a); } }); });
+  ALL.forEach(function (a) { if (a.cond && !a.cond()) return; ents.push({ y: a.py, d: function () { drawNpc(a); } }); });
   CHESTS.forEach(function (c, i) { ents.push({ y: (c.ty + .5) * T, d: function () { drawChest(c, i); } }); });
   ents.push({ y: 32 * T, d: drawBeacon });
   ents.push({ y: 38 * T, d: drawSeonggyun });
@@ -782,7 +907,7 @@ function draw() {
   if (zOn()) ZOMB.forEach(function (z) { ents.push({ y: z.y, d: function () { drawZombie(z); } }); });
   ents.push({ y: P.y, d: drawPlayer });
   ents.sort(function (a, b) { return a.y - b.y; });
-  ents.forEach(function (e) { e.d(); });
+  ents.forEach(function (e) { e.d(); ctx.globalAlpha = 1; });
   drawGateLabel(); drawSamsaLink(); drawZFX();
   if (zOn()) drawNight(camX, camY, k);
 }
@@ -1069,13 +1194,16 @@ function drawSign(a) {
   if (!S.sign) { var b = Math.sin(anim * 5) * 2; c.fillStyle = '#ffdf4a'; c.strokeStyle = '#7a5410'; c.lineWidth = 2; c.font = '900 16px sans-serif'; c.strokeText('!', x, y - 70 + b); c.fillText('!', x, y - 70 + b); }
 }
 function drawNpc(a) {
+  ctx.globalAlpha = 1;
   if (a.type === 'sign') return drawSign(a);
   var o = a.look; var o2 = { robe: o.robe, hat: o.hat, face: 'd', bob: Math.sin(anim * 2 + a.tx) * .8, pack: a.type === 'shop', cane: !!o.cane };
+  if (a.type === 'hero') ctx.globalAlpha = Math.max(.05, Math.min(1, shipP * 1.3));
   drawPerson(ctx, a.px, a.py, o2);
+  if (a.type === 'hero') { ctx.fillStyle = '#f1b72c'; ctx.fillRect(a.px - 1, a.py - 33, 2, 6); ctx.fillStyle = '#c0392b'; ctx.fillRect(a.px - 2, a.py - 38, 4, 5); }
   var ly = a.py - 28, done = a.type === 'lesson' && S.stamps[a.id], locked = a.type === 'lesson' && !done && !!lockLines(a);
   var txt = locked ? '🔒 ' + a.label : (a.type === 'lesson' && !done ? a.label : (a.type === 'lesson' ? '✔ ' + a.name : a.label));
   drawLabel(ctx, a.px, ly, txt, locked ? 'rgba(110,40,40,.92)' : (done ? 'rgba(30,110,60,.9)' : (a.type === 'lesson' ? null : 'rgba(150,50,40,.9)')));
-  var mark = (a.type === 'lesson' && !done && !locked) || (a.type === 'king' && allDone() && !S.done) || (a.type === 'goblin' && !S.intro);
+  var mark = (a.type === 'lesson' && !done && !locked) || (a.type === 'king' && allDone() && !S.done) || (a.type === 'goblin' && !S.intro) || (a.type === 'hero' && !S.metHero);
   if (mark) { var b = Math.sin(anim * 5 + a.tx) * 2; ctx.fillStyle = '#ffdf4a'; ctx.strokeStyle = '#7a5410'; ctx.lineWidth = 2; ctx.font = '900 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.strokeText('!', a.px, ly - 16 + b); ctx.fillText('!', a.px, ly - 16 + b); }
   if (a.type === 'king' && !allDone()) { ctx.font = '700 11px sans-serif'; }
 }
@@ -1091,7 +1219,7 @@ function setGate(open) {
   [10, 11].forEach(function (y) { map[y][44] = open ? G.GATE : G.LOCK; drawTile(c, map[y][44], 44, y); });
   gateOpen = open;
 }
-function syncShip() { shipP = S.stamps.sugun ? 1 : 0; }
+function syncShip() { shipP = S.stamps.sugun ? 1 : 0; blk[40 * MW + 11] = S.stamps.sugun ? 1 : 0; }
 function syncGate() { var want = zoneDone(0); if (want !== gateOpen) setGate(want); }
 function drawGateLabel() {
   var x = 44.5 * T, y = 10 * T - 10;
@@ -1326,6 +1454,7 @@ function interact(n) {
   if (n.type === 'goblin') return goblin(false);
   if (n.type === 'shop') return shop('');
   if (n.type === 'king') return king();
+  if (n.type === 'hero') return heroTalk();
   lesson(n);
 }
 function lessonParts(n) {
@@ -1381,13 +1510,13 @@ function quiz(n) {
       if (!gateOpen && zoneDone(0)) { setGate(true); justOpened = true; gateMsg = '\n\n🚪 궁궐 동쪽 문이 열렸다! 감영 마을로 가는 길이 생겼어요.'; big = true; }
       if (n.id === 'sogwa') gateMsg += '\n\n📜 소과에 합격했다! 이제 성균관의 대사성을 만날 수 있다.';
       if (n.id === 'seonggyun') gateMsg += '\n\n🎓 성균관 유생이 되었다! 이제 대과 시험관에게 도전할 수 있다.';
-      if (n.id === 'sugun') { justShip = true; gateMsg += '\n\n🐢 남쪽 호수에 거북선이 나타났다!'; big = true; }
+      if (n.id === 'sugun') { justShip = true; blk[40 * MW + 11] = 1; pendingHero = !S.metHero; gateMsg += '\n\n🐢 남쪽 호수에 거북선이 나타났다!'; big = true; }
       if (big) sfx.win(); else { sfx.fan(); burst(14); }
       var left = TOTAL - stampCount();
       return '⭕ 정답! 도장을 받았다.\n📌 ' + n.name + ': ' + n.sum + '\n🪙 엽전 +' + g + bonus + gateMsg + (left === 0 ? '\n\n🎉 모든 도장을 모았다! 임금님께 가 보자.' : '');
     },
     after: function () {
-      if (justShip) { justShip = false; setTimeout(function () { toast('🐢 거북선이 나타났다! 아래쪽 호수를 보자 ↓'); }, 300); }
+      if (justShip) { justShip = false; setTimeout(function () { toast('🐢 거북선이 떠오른다…!'); }, 300); }
       if (justOpened) { justOpened = false; setTimeout(function () { toast('🚪 궁궐 동쪽 문이 열렸다! 동쪽으로 가 보자 →'); }, 300); }
       if (!S.samsa && SAMSA.every(function (id) { return S.stamps[id]; })) { samsa(); return; }
       if (!S.bond && S.stamps.suryeong && S.stamps.hyangri) { bondScene(); return; }
@@ -1437,6 +1566,62 @@ function goblin(first) {
 function shop(pre) {
   var txt = (pre ? pre + '\n' : '') + '어서 오시오! 힌트 부적은 퀴즈에서 틀린 보기 하나를 지워 준다오. 엽전 3냥이면 한 장이오.';
   showChoices('보부상', txt, [{ label: '🧿 힌트 부적 사기 (3 엽전)', fn: function () { if (S.coins >= 3) { S.coins -= 3; S.hints++; hud(); save(); sfx.coin(); shop('고맙소! 부적 한 장 받으시오. (엽전 ' + S.coins + ' / 부적 ' + S.hints + ')'); } else { sfx.no(); shop('엽전이 모자라오. 길에 떨어진 엽전을 주워 오시오!'); } } }, { label: '🌿 약초 사기 (체력 +1, 2 엽전)', fn: function () { if (S.hp >= 3) shop('이미 기운이 넘치는구려!'); else if (S.coins >= 2) { S.coins -= 2; S.hp++; hud(); save(); sfx.coin(); shop('약초를 먹으니 기운이 난다! (❤ ' + S.hp + '/3)'); } else { sfx.no(); shop('엽전이 모자라오.'); } } }, { label: '닫기', fn: closeDlg }]);
+}
+/* ---------- 문명식 인물 등장 화면 ---------- */
+var cineSt = null, cineT = 0, pendingHero = false;
+(function () {
+  var g = document.getElementById('cgrass'), h = '';
+  for (var i = 0; i < 150; i++) { var x = Math.random() * 1600, y = 780 + Math.random() * 130, l = 20 + Math.random() * 40, b = (Math.random() - .5) * 18; h += '<path d="M' + x.toFixed(0) + ' ' + y.toFixed(0) + ' q' + (b / 2).toFixed(0) + ' ' + (-l / 2).toFixed(0) + ' ' + b.toFixed(0) + ' ' + (-l).toFixed(0) + '"/>'; }
+  g.innerHTML = h;
+})();
+function cine(cfg) {
+  cineSt = { cfg: cfg, i: 0, typing: false, full: '' };
+  setMode('cine');
+  $('cName').innerHTML = cfg.name; $('cStat').textContent = cfg.stat || ''; $('cText').textContent = ''; $('cOpts').innerHTML = '';
+  var el = $('cine'); el.classList.remove('hide');
+  ['.cbg', '.chero'].forEach(function (sel) { var e = el.querySelector(sel); e.style.animation = 'none'; void e.getBoundingClientRect(); e.style.animation = ''; });
+  void el.offsetWidth; el.classList.add('show');
+  tone(98, .7, 'triangle', .12); trumpet(392, .45, .25); trumpet(523, .45, .5); trumpet(659, 1.0, .75); trumpet(784, 1.0, .75);
+  setTimeout(cineStep, 900);
+}
+function cineStep() {
+  var st = cineSt; if (!st) return;
+  var step = st.cfg.steps[st.i], el = $('cText'), k = 0;
+  $('cOpts').innerHTML = ''; clearInterval(cineT); st.typing = true; st.full = step.t; el.textContent = '';
+  cineT = setInterval(function () { k += 2; el.textContent = step.t.slice(0, k); if (k >= step.t.length) { clearInterval(cineT); st.typing = false; cineOpts(); } }, 26);
+}
+function cineOpts() {
+  var st = cineSt, step = st.cfg.steps[st.i], box = $('cOpts'); box.innerHTML = '';
+  step.o.forEach(function (lab, j) { var b = document.createElement('button'); b.textContent = lab; b.onclick = function () { cineChoose(j); }; box.appendChild(b); });
+}
+function cineSkip() { var st = cineSt; if (st && st.typing) { clearInterval(cineT); st.typing = false; $('cText').textContent = st.full; cineOpts(); } }
+function cineChoose() { var st = cineSt; if (!st || st.typing) return; sfx.ui(); st.i++; if (st.i >= st.cfg.steps.length) cineEnd(); else cineStep(); }
+function cineEnd() {
+  var st = cineSt, el = $('cine'); el.classList.remove('show'); $('cOpts').innerHTML = '';
+  setTimeout(function () { el.classList.add('hide'); cineSt = null; setMode('play'); if (st && st.cfg.onEnd) st.cfg.onEnd(); }, 700);
+}
+function heroCine() {
+  var z = zOn();
+  cine({
+    name: '<span class="cn-c">조선</span><span class="cn-t">의 전라좌도수군절도사 </span><span class="cn-n">이순신</span>',
+    stat: '⚓ 남해 바다를 지키는 중',
+    steps: [
+      { t: '수군절도사가 하는 일을 잘 배웠구나. 나도 전라좌도수군절도사를 지내던 시절이 있었지.', o: ['장군님! 수군절도사는 어떤 일을 하나요?', '(고개 숙여 인사한다)'] },
+      { t: '수군절도사는 바다를 지키는 수군을 지휘하는 자리라네. 나는 그 시절 거북선을 만들어, 임진왜란 때 이 배들과 함께 바다를 지켰지.', o: ['거북선이 정말 멋져요!', '음…… (감탄한다)'] },
+      { t: z ? '밤길을 떠도는 좀비들도 결국 지혜로 이겨 낼 수 있을 걸세. 그대를 믿네!' : '그대도 배운 지혜로 이 나라를 지키는 데 힘을 보태 주게.', o: ['반드시 해내겠습니다!', '(경례한다)'] }
+    ],
+    onEnd: function () { if (!S.metHero) { S.metHero = true; S.coins += 3; hud(); save(); sfx.fan(); burst(10); toast('⚓ 이순신 장군의 격려를 받았다! 엽전 +3'); } }
+  });
+}
+
+function heroTalk() { heroCine(); }
+function heroTalkOld() {
+  var lines = ['(갑옷을 입은 장수가 거북선 쪽에서 걸어온다.)', '"수군절도사가 하는 일을 잘 배웠구나. 나도 전라좌도수군절도사를 지내던 시절이 있었지."', '"수군절도사는 바다를 지키는 수군을 지휘하는 자리라네. 나는 그 시절 거북선을 만들어, 임진왜란 때 이 배들과 함께 바다를 지켰지."', zOn() ? '"밤길을 떠도는 좀비들도 결국 지혜로 이겨 낼 수 있을 걸세. 그대를 믿네!"' : '"그대도 배운 지혜로 이 나라를 지키는 데 힘을 보태 주게."'];
+  if (S.metHero) lines = lines.slice(1);
+  showLines('이순신', lines, function () {
+    if (!S.metHero) { S.metHero = true; S.coins += 3; hud(); save(); sfx.fan(); burst(10); setTimeout(function () { toast('⚓ 이순신 장군의 격려를 받았다! 엽전 +3'); }, 200); }
+    closeDlg();
+  });
 }
 function king() {
   var n = stampCount();
@@ -1648,7 +1833,7 @@ function openMap() {
     c.fillStyle = '#fff'; c.fillText(z.n, cx, cy - 6); c.font = '12px "Noto Sans KR", sans-serif'; c.fillText('학습지 ' + z.s.slice(0, 3), cx, cy + 9);
   });
   NPCS.forEach(function (a) { c.fillStyle = S.stamps[a.id] ? '#3ccf7b' : '#ffdf4a'; c.beginPath(); c.arc(a.px * k, a.py * k, 3.5, 0, 7); c.fill(); });
-  ALL.filter(function (a) { return a.type !== 'lesson'; }).forEach(function (a) { c.fillStyle = '#ff7a6b'; c.beginPath(); c.arc(a.px * k, a.py * k, 4.5, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 11px sans-serif'; c.fillText(a.label, a.px * k, a.py * k - 7); });
+  ALL.filter(function (a) { return a.type !== 'lesson' && !(a.cond && !a.cond()); }).forEach(function (a) { c.fillStyle = '#ff7a6b'; c.beginPath(); c.arc(a.px * k, a.py * k, 4.5, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 11px sans-serif'; c.fillText(a.label, a.px * k, a.py * k - 7); });
   c.fillStyle = '#3b8bff'; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.arc(P.x * k, P.y * k, 6, 0, 7); c.fill(); c.stroke();
   $('mapov').classList.remove('hide');
 }
@@ -1686,6 +1871,9 @@ window.addEventListener('keydown', function (e) {
       if (dlg.mode === 'quiz' && dlg.pick) dlg.pick(i);
       else if (dlg.mode === 'choices' && dlg.btns[i]) { sfx.ui(); dlg.btns[i].fn(); }
     } else if (k === 'escape' && dlg.mode !== 'quiz') closeDlg();
+  } else if (mode === 'cine') {
+    if (k === 'e' || k === ' ' || k === 'enter') cineSkip();
+    else if ((k === '1' || k === '2') && cineSt && !cineSt.typing) cineChoose(+k - 1);
   } else if (mode === 'zq') {
     if (k === '1' || k === '2') answerZQ(+k - 1);
   } else if (mode === 'mini') {
