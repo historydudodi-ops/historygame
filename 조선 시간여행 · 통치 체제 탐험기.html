@@ -200,6 +200,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 .copts button { background: linear-gradient(#5d7c93, #2f4a5e); color: #fff; border: 2px solid #9fc0d6; border-radius: 8px; padding: 7px 14px; font-weight: 700; font-size: clamp(15px, 1.8vw, 19px); }
 .copts button:hover { filter: brightness(1.2); }
 @media (prefers-reduced-motion: reduce) { .cbg, .chero, .cbreath, .chead, .cplume, .cwaves { animation: none !important; } }
+#fade { position: fixed; inset: 0; z-index: 62; background: #000; color: #fff; display: grid; place-items: center; text-align: center; font-weight: 900; font-size: clamp(24px, 4vw, 44px); opacity: 0; pointer-events: none; transition: opacity .6s; padding: 20px; word-break: keep-all; }
+#fade.show { opacity: 1; pointer-events: auto; }
 @media (max-width: 760px) { .pgrid { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .jgrid { grid-template-columns: 1fr; } .dopts { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .shake, .conf { animation: none !important; } }
@@ -214,6 +216,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
     <span class="pill" title="힌트 부적">🧿 <b id="hHint">0</b></span>
     <span class="pill">📖 <b id="hStamp">0/23</b></span>
     <span class="pill" id="hHp">❤️❤️❤️</span>
+    <span class="pill hide" id="hJail" style="border-color:#e5604f"></span>
     <div class="stam"><span id="hRun">👟 달리기 장착 (Shift)</span><div class="sbar"><i id="sFill"></i></div></div>
   </div>
   <div>
@@ -266,6 +269,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 <div id="mini" class="ov hide"><div class="card mc"><h2 id="mTitle"></h2><p id="mDesc"></p><div id="mBody"></div><div class="msg" id="mRes"></div><div class="crow" style="justify-content:center" id="mBtns"></div></div></div>
 <div id="zq" class="ov hide"><div class="card"><h2 id="zqT">🧟 좀비에게 붙잡혔다!</h2><p id="zqS">8초 안에 정답을 외쳐 정신을 되찾게 하라!</p><p id="zqQ"></p><div class="zbar"><i id="zqBar"></i></div><div class="zopts" id="zqO"></div><div class="msg" id="zqR"></div></div></div>
 <div id="flash"></div>
+<div id="fade"></div>
 <div id="cine" class="hide" aria-live="polite">
   <div class="cbar"></div>
   <div class="cscene" id="cscene">
@@ -416,7 +420,7 @@ function burst(n) {
 /* ---------- save ---------- */
 var KEY = 'joseon-rpg-v1';
 var S = null;
-function freshSave() { return { name: '학생', coins: 0, hints: 0, stamps: {}, got: {}, chests: {}, wrongs: 0, streak: 0, minis: {}, x: 0, y: 0, done: false, intro: false, samsa: false, sign: false, bond: false, metHero: false, part: {}, hp: 3, zoff: false, cured: 0 }; }
+function freshSave() { return { name: '학생', coins: 0, hints: 0, stamps: {}, got: {}, chests: {}, wrongs: 0, streak: 0, minis: {}, x: 0, y: 0, done: false, intro: false, samsa: false, sign: false, bond: false, metHero: false, part: {}, hp: 3, zoff: false, cured: 0, jailNext: 10, jailInit: true, jailed: 0 }; }
 function save() { try { if (S) { S.x = P.x; S.y = P.y; localStorage.setItem(KEY, JSON.stringify(S)); } } catch (e) {} }
 function loadSave() { try { var r = localStorage.getItem(KEY); if (!r) return null; var o = JSON.parse(r); var f = freshSave(); for (var k in f) if (!(k in o)) o[k] = f[k]; return o; } catch (e) { return null; } }
 
@@ -443,7 +447,8 @@ function buildMap() {
   R(G.HALL, 26, 3, 11, 4);                              // 근정전
   R(G.WATER, 19, 3, 6, 5); R(G.WATER, 39, 3, 5, 5);    // 경회루·향원정 연못
   R(G.WATER, 19, 12, 25, 1); R(G.STONE, 30, 12, 3, 1); // 금천과 영제교
-  R(G.HALL, 37, 13, 7, 2);                              // 3사 청사
+  R(G.HALL, 37, 13, 7, 2); R(G.HALL, 39, 8, 3, 2);                              // 3사 청사
+  R(G.HALL, 19, 13, 3, 1); R(G.HALL, 24, 13, 3, 1);    // 의금부 · 한성부
   // 감영 마을
   R(G.DIRT, 46, 3, 16, 16);
   R(G.FENCE, 46, 3, 16, 1); R(G.FENCE, 46, 18, 16, 1); R(G.FENCE, 46, 3, 1, 16); R(G.FENCE, 61, 3, 1, 16);
@@ -487,6 +492,9 @@ N('yukjo', 0, 26, 10, '6조 판서', '6조', { robe: C.green, hat: 'gwan' },
 N('seungjeongwon', 0, 36, 10, '도승지', '승정원', { robe: C.purple, hat: 'gwan' },
   ['나는 승정원의 도승지요. 왕의 곁에서 일하는 비서 기관이라오.', '왕의 명령을 신하들에게 전하고, 신하들의 보고를 왕에게 올리는 일을 하오.'],
   '왕명을 전달하고 신하의 보고를 왕에게 올린 비서 기관은?', ['승정원', '의정부', '사헌부', '6조'], '왕명을 출납하는 왕의 비서 기관');
+N('chunchu', 0, 40, 10, '기사관', '춘추관', { robe: '#5a4a7a', hat: 'gwan' },
+  ['나는 기사관이오. 내가 일하는 관청은 나랏일을 기록하고 역사를 편찬하는 곳이지.', '그날그날의 나랏일을 꼼꼼히 기록해 두었다가, 그 기록을 바탕으로 실록 같은 역사책을 편찬하오.'],
+  '나랏일을 기록하고 실록 같은 역사 편찬을 맡은 관청은?', ['춘추관', '홍문관', '승정원', '의금부'], '나랏일 기록 · 역사(실록) 편찬');
 N('saheonbu', 0, 38, 15, '대사헌', '사헌부', { robe: C.red, hat: 'gwan' },
   ['나는 사헌부의 대사헌이오. 관리들의 잘못과 비리를 감찰하는 곳이지.', '사헌부·사간원·홍문관을 합쳐 3사라고 하며, 언론 기능으로 왕과 관리를 견제했소.'],
   '관리들의 잘못을 감찰하고 따진 3사의 기관은?', ['사헌부', '사간원', '홍문관', '승정원'], '관리의 비리를 감찰 (3사)');
@@ -496,6 +504,12 @@ N('sagan', 0, 40, 15, '대사간', '사간원', { robe: C.teal, hat: 'gwan' },
 N('hongmun', 0, 42, 15, '대제학', '홍문관', { robe: C.gold, hat: 'gwan' },
   ['나는 홍문관의 대제학이오. 책과 학문을 다루는 곳이지.', '왕의 학문과 정책 자문에 응하고 경연에도 참여하오. 3사의 마지막 기관이라오.'],
   '왕의 학문과 정책 자문에 응한 3사의 기관은?', ['홍문관', '사헌부', '사간원', '승정원'], '왕의 학문·정책 자문 (3사)');
+N('uigeumbu', 0, 20, 14, '판의금부사', '의금부', { robe: '#3a3a48', hat: 'gwan' },
+  ['나는 판의금부사요. 이곳은 왕의 명령을 받아 움직이는 특별한 사법 기관이지.', '반역처럼 나라를 뒤흔드는 큰 죄를 지은 죄인을 왕명에 따라 직접 다스리오.'],
+  '왕명을 받아 나라의 큰 죄인을 다스린 특별 사법 기관은?', ['의금부', '사헌부', '한성부', '승정원'], '왕명으로 나라의 큰 죄인을 다스린 사법 기관');
+N('hanseong', 0, 25, 14, '판윤', '한성부', { robe: '#2f6a5a', hat: 'gwan' },
+  ['나는 판윤이오. 내가 맡은 관청은 수도 한성(한양)을 맡아 다스리는 곳이지.', '도성의 행정과 치안을 맡아 한양 백성들의 살림을 돌보오.'],
+  '수도 한성(한양)의 행정과 치안을 맡은 관청은?', ['한성부', '의금부', '6조', '관찰사'], '수도 한성(한양)의 행정과 치안 담당');
 N('gwanchal', 1, 50, 9, '관찰사', '관찰사', { robe: C.navy, hat: 'gwan' },
   ['나는 도를 다스리는 관찰사다. 조선은 전국을 8개의 도로 나누었고, 도마다 관찰사를 파견했지.', '그러니까 관찰사는 중앙에서 도에 내려보낸 최고 지방관이다.'],
   '도에 파견되어 그 지역을 다스린 최고 지방관은?', ['관찰사', '수령', '향리', '병마절도사'], '8도에 파견된 도의 최고 지방관');
@@ -569,7 +583,7 @@ N('seonggyun', 3, 56, 38, '대사성', '성균관', { robe: C.navy, hat: 'gat' }
 // 봉수제 보기 중복 제거
 NPCS.forEach(function (n) { var seen = {}; n.o = n.o.filter(function (t) { if (seen[t]) return false; seen[t] = 1; return true; }); });
 // 이름표에 정답(직책·기관명)이 드러나지 않도록 인물 이름을 붙임
-var RENAME = { yukjo: '신여량', gwanchal: '정윤겸', suryeong: '한기석', hyangri: '최막동', yuhyangso: '서진익',
+var RENAME = { chunchu: '하경수', uigeumbu: '노상철', hanseong: '유정목', yukjo: '신여량', gwanchal: '정윤겸', suryeong: '한기석', hyangri: '최막동', yuhyangso: '서진익',
   owi: '강돌쇠', byeongma: '권무혁', sugun: '이해룡', bongsu: '박칠복', yeokcham: '오만석',
   sogwa: '남궁선', munkwa: '조경환', daegwa: '홍재윤', mugwa: '장도윤', japgwa: '허정민', eumseo: '민세창', cheongeo: '송치헌' };
 NPCS.forEach(function (n) { if (RENAME[n.id]) { n.role = n.label; n.label = RENAME[n.id]; } });
@@ -603,6 +617,9 @@ var FINAL_POOL = [
   { q: '지방 수군을 지휘한 지휘관은?', o: ['수군절도사', '병마절도사', '수령', '관찰사'] },
   { q: '조선에서 사라진, 고려의 특수 행정 구역은?', o: ['향·부곡·소', '8도', '수령', '관찰사'] },
   { q: '고려의 북쪽 국경 지역 군사 행정 구역으로 조선에서 사라진 것은?', o: ['양계', '8도', '도호부', '유향소'] },
+  { q: '왕명을 받아 나라의 큰 죄인을 다스린 기관은?', o: ['의금부', '한성부', '사간원', '향교'] },
+  { q: '나랏일을 기록하고 실록 편찬을 맡은 관청은?', o: ['춘추관', '홍문관', '승정원', '사헌부'] },
+  { q: '수도 한성의 행정과 치안을 맡은 관청은?', o: ['한성부', '의금부', '관찰사', '5위'] },
   { q: '조선 최고의 교육 기관은?', o: ['성균관', '향교', '4부 학당', '서당'] },
   { q: '생원시·진사시로 나뉘며 합격하면 성균관 입학 자격을 주는 시험은?', o: ['소과', '대과', '무과', '잡과'] }
 ];
@@ -752,6 +769,7 @@ function update(dt) {
   if (mode === 'zq') tickZQ(dt);
   if (mode !== 'play') { P.moving = false; return; }
   if (pendingHero && shipP >= 1) { pendingHero = false; heroCine(); return; }
+  if (!S.done && !race && !jailing && S.wrongs >= (S.jailNext || 10)) { startJail(); return; }
   updateZombies(dt);
   if (S.stamps.sugun && shipP < 1) shipP = Math.min(1, shipP + dt / 2.5);
   var mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
@@ -759,6 +777,7 @@ function update(dt) {
   var moving = !!(mx || my);
   var wantRun = keys.shift || runToggle;
   var running = false;
+  if (jailT > 0) { jailT -= dt; moving = false; if (jailT <= 0) toast('🔓 의금부 문이 열렸다. 다시 길을 떠나자!'); }
   if (moving) {
     var n = Math.hypot(mx, my); mx /= n; my /= n;
     if (Math.abs(mx) > Math.abs(my)) P.face = mx > 0 ? 'r' : 'l'; else P.face = my > 0 ? 'd' : 'u';
@@ -902,7 +921,7 @@ function draw() {
   ents.push({ y: 15 * T, d: drawGwanghwamun }); ents.push({ y: 7 * T, d: drawGeunjeongjeon });
   ents.push({ y: 8 * T, d: drawGyeonghoeru }); ents.push({ y: 8 * T, d: drawHyangwonjeong });
   ents.push({ y: 37 * T, d: drawHyanggyo });
-  ents.push({ y: 29 * T, d: drawExamInterior }); ents.push({ y: 9 * T, d: drawBond }); ents.push({ y: 13 * T, d: drawSamsaHall }); ents.push({ y: 33 * T, d: drawExamGate });
+  ents.push({ y: 29 * T, d: drawExamInterior }); ents.push({ y: 9 * T, d: drawBond }); ents.push({ y: 13 * T, d: drawSamsaHall }); ents.push({ y: 10 * T - 1, d: drawChunchu }); ents.push({ y: 14 * T - 2, d: function () { drawYamen(19, '義禁府', '#3b4452'); drawYamen(24, '漢城府', '#44546a'); } }); ents.push({ y: 33 * T, d: drawExamGate });
   if (shipP > 0) ents.push({ y: 43 * T, d: drawShip });
   if (zOn()) ZOMB.forEach(function (z) { ents.push({ y: z.y, d: function () { drawZombie(z); } }); });
   ents.push({ y: P.y, d: drawPlayer });
@@ -1027,6 +1046,16 @@ function drawHyangwonjeong() {
   drawLabel(c, cx, Y - 8, '향원정', 'rgba(30,60,120,.92)');
 }
 var SAMSA = ['saheonbu', 'sagan', 'hongmun'], samsaT0 = -99;
+function drawChunchu() {
+  var c = ctx, X = 39 * T, Y = 8 * T;
+  drawHall(c, X + 4, Y - 6, 88, 66, 30, 1, true, '#44546a');
+  c.fillStyle = '#1d1d22'; c.fillRect(X + 26, Y + 32, 44, 13); c.fillStyle = '#f1d37a'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('春秋館', X + 48, Y + 39);
+}
+function drawYamen(tx, hanja, roof) {
+  var c = ctx, X = tx * T, Y = 13 * T;
+  drawHall(c, X + 4, Y - 36, 88, 66, 30, 1, true, roof);
+  c.fillStyle = '#1d1d22'; c.fillRect(X + 26, Y - 4, 44, 13); c.fillStyle = '#f1d37a'; c.font = '700 10px "Noto Sans KR", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(hanja, X + 48, Y + 3);
+}
 function drawSamsaHall() {
   var c = ctx, X = 37 * T, Y = 13 * T, on = !!S.samsa;
   drawHall(c, X + 6, Y - 10, 212, 70, 34, 1, true, on ? '#44546a' : '#59616e');
@@ -1210,6 +1239,12 @@ function drawNpc(a) {
 function drawPlayer() {
   var bob = P.moving ? Math.abs(Math.sin(P.step)) * -2 : 0, sw = P.moving ? Math.sin(P.step) : 0;
   drawPerson(ctx, P.x, P.y - 2, { robe: '#2f6fdb', hat: 'none', face: P.face, bob: bob, swing: sw, collar: true });
+  if (jailT > 0) {
+    var jx = P.x - 16, jy = P.y - 40;
+    ctx.fillStyle = '#5a361d'; ctx.fillRect(jx - 2, jy - 3, 36, 5); ctx.fillRect(jx - 2, jy + 50, 36, 5);
+    for (var b = 0; b < 6; b++) ctx.fillRect(jx + b * 6.2, jy, 3, 52);
+    ctx.fillStyle = '#f1b72c'; ctx.fillRect(jx + 14, jy + 22, 5, 5);
+  }
   if (race) { ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fillRect(P.x - 14 - (P.moving ? 6 : 0), P.y + 4, 10, 2); }
 }
 var gateOpen = false, lockMsgT = 0;
@@ -1235,8 +1270,11 @@ function hud() {
   $('hCoin').textContent = S.coins; $('hHint').textContent = S.hints; $('hStamp').textContent = stampCount() + '/' + TOTAL;
   var hp = Math.max(0, Math.min(3, S.hp)); $('hHp').textContent = '❤️'.repeat(hp) + '🖤'.repeat(3 - hp); $('hHp').style.display = zOn() ? '' : 'none';
   $('bZ').textContent = zOn() ? '🧟 ON' : '🧟 OFF';
+  var rem = (S.jailNext || 10) - (S.wrongs || 0), hj = $('hJail');
+  if (!S.done && rem > 0 && rem <= 3) { hj.textContent = '⚖️ ' + rem + '번 더 틀리면 의금부행!'; hj.classList.remove('hide'); } else hj.classList.add('hide');
 }
 /* ---------- zombies ---------- */
+var jailT = 0;
 var ZOMB = [], ZFX = [], zRespawn = [], invul = 0, zq = null, hbT = 0, regenT = 0, danger = 0;
 function zOn() { return !!S && !S.zoff && !S.done; }
 function zTarget() { return Math.min(13, 9 + Math.floor(stampCount() / 6)); }
@@ -1319,9 +1357,40 @@ function answerZQ(i) {
   save();
   setTimeout(function () { $('zq').classList.add('hide'); var dead = S.hp <= 0; zq = null; setMode('play'); if (dead) faint(); }, ok ? 1300 : 2000);
 }
+var jailing = false;
+function reviewQ() {
+  var pool = [];
+  NPCS.forEach(function (n) { if (!S.stamps[n.id]) return; if (n.parts) n.parts.forEach(function (p) { pool.push({ q: p.q, o: p.o }); }); else pool.push({ q: n.q, o: n.o }); });
+  if (pool.length < 3) pool = pool.concat(FINAL_POOL);
+  var it = pool[Math.floor(Math.random() * pool.length)];
+  return { q: it.q, o: it.o, a: it.o[0] };
+}
+function startJail() {
+  jailing = true; setMode('jail');
+  var f = $('fade'), off = NPCS.filter(function (n) { return n.id === 'uigeumbu'; })[0];
+  f.innerHTML = '⚖️ "게 섰거라! 의금부에서 나왔다!"<br><small style="font-size:.5em;font-weight:700">문제를 ' + S.wrongs + '번이나 틀려 의금부로 끌려간다…</small>';
+  f.classList.add('show'); tone(110, .4, 'square', .07); tone(82, .7, 'sawtooth', .06, .25); flash();
+  setTimeout(function () {
+    P.x = 22.5 * T; P.y = 15.5 * T; P.face = 'd'; jailT = 999; invul = 4; race = null; $('racehud').classList.add('hide');
+    f.classList.remove('show');
+    setTimeout(function () {
+      showLines(off.label, ['(나졸들이 양팔을 붙잡아 의금부 옥에 가두었다…)', '"의금부는 본래 왕명을 받들어 반역 같은 나라의 큰 죄인을 다스리는 곳이니라."', '"그런데 문제를 이리도 많이 틀리다니! 임금님께서 특별히 재심을 명하셨다."', '"지금부터 세 문제를 내겠다. 모두 맞히면 풀어 주마!"'], function () { jailQuiz(0, off); });
+    }, 500);
+  }, 1800);
+}
+function jailQuiz(i, off) {
+  if (i >= 3) {
+    showLines(off.label, ['"좋다, 공부한 보람이 있구나! 풀어 주겠다."', '"다음부터는 설명을 잘 듣고 문제를 풀거라. 열 번을 더 틀리면 다시 잡으러 갈 것이니라!"'], function () {
+      closeDlg(); jailing = false; S.jailNext = S.wrongs + 10; S.jailed = (S.jailed || 0) + 1; jailT = 1.2; hud(); save(); sfx.fan();
+    });
+    return;
+  }
+  showQuiz(off.label + ' · 재심 ' + (i + 1) + '/3', reviewQ(), { noCount: true, onCorrect: function () { return i < 2 ? '⭕ 맞았다! 다음 문제다.' : '⭕ 세 문제를 모두 맞혔다!'; }, after: function () { jailQuiz(i + 1, off); } });
+}
 function faint() {
-  var lost = Math.min(3, S.coins); S.coins -= lost; S.hp = 3; P.x = 31.5 * T; P.y = 20.5 * T; invul = 3; hud(); save();
-  toast('😵 기절했다… 도깨비가 광장으로 데려다 주었다' + (lost ? ' (엽전 -' + lost + ')' : ''));
+  var lost = Math.min(3, S.coins), off = NPCS.filter(function (n) { return n.id === 'uigeumbu'; })[0];
+  S.coins -= lost; S.hp = 3; P.x = 22.5 * T; P.y = 15.5 * T; P.face = 'd'; invul = 4; jailT = 2.5; hud(); save();
+  showLines(off.label, ['(눈을 떠 보니 나무 창살 안이다…)', '"정신이 드느냐? 길에 쓰러진 너를 나졸들이 이곳 의금부로 끌고 왔느니라."', '"의금부는 왕명을 받들어 나라의 큰 죄인을 다스리는 곳이다. 너는 죄인이 아니니 이번만은 풀어 주마.' + (lost ? ' 다만 치료비로 엽전 ' + lost + '냥은 받아 두겠다!"' : '"')], closeDlg);
 }
 function drawZombie(z) {
   var c = ctx, cx = z.x, cy = z.y - 2 + Math.sin(z.ph * 6), fy = cy + 11, sw = Math.sin(z.ph * 4) * 1.5, rob = '#6f6a5c', sk = '#9cc58a', i;
@@ -1436,7 +1505,7 @@ function showQuiz(name, qo, opts) {
       dlg.mode = 'fb'; dlg.next = opts.after; $('dopts').innerHTML = ''; $('dhint').innerHTML = ''; $('dfb').textContent = ''; typeText(msg);
       $('dnext').classList.remove('hide'); $('dnext').textContent = '확인 ▶';
     } else {
-      sfx.no(); wrongs++; S.wrongs++; S.streak = 0; off[t] = 1; render('❌ 아쉬워요! 방금 들은 설명을 떠올려 봐요.');
+      sfx.no(); wrongs++; if (!opts.noCount) S.wrongs++; S.streak = 0; hud(); off[t] = 1; render('❌ 아쉬워요! 방금 들은 설명을 떠올려 봐요.');
       var bx = $('dbox'); bx.classList.remove('shake'); void bx.offsetWidth; bx.classList.add('shake'); save();
     }
   }
@@ -1559,7 +1628,8 @@ function bondScene() {
 }
 function goblin(first) {
   var lines = ['어이쿠, 조선에 온 걸 환영한다, 이방인!', '너는 낡은 학습지의 빛에 빨려 들어왔다. 조선의 통치 체제를 모두 배워야 돌아갈 수 있어!', '…발이 가벼워진다! 달리기 신발 장착 완료 👟\nShift를 누르고 이동하면 달릴 수 있어. 숨이 차면 잠깐 걸어서 쉬어라.', '네 구역을 돌며 관리들에게 설명을 듣고 퀴즈를 맞히면 도장을 준다. 도장 ' + TOTAL + '개를 모아 임금님을 만나라!\n궁궐 관청의 문제를 모두 풀면 동쪽 문이 열려 감영 마을로 갈 수 있다. 엽전과 보물 상자도 찾아봐. 길을 잃으면 M(지도), 복습은 J(학습지)!'];
-  if (zOn()) lines.splice(3, 0, '그런데 큰일이다! 밤이 되자 괴질이 퍼져 사람들이 좀비가 되어 길을 떠돈다…', '등불이 밝은 관청 구역과 이 광장은 안전하다. 길에서 좀비에게 붙잡히면 퀴즈가 나온다! 맞히면 그 사람이 정신을 되찾고, 틀리면 체력(❤)이 줄어. 체력이 다 떨어지면 기절해서 엽전을 잃는다. 좀비가 보이면 Shift로 달려 도망쳐!');
+  lines.push('참, 문제를 열 번 틀릴 때마다 의금부 나졸들이 잡으러 온다는 소문이 있다! 설명을 잘 듣고 풀어라.');
+  if (zOn()) lines.splice(3, 0, '그런데 큰일이다! 밤이 되자 괴질이 퍼져 사람들이 좀비가 되어 길을 떠돈다…', '등불이 밝은 관청 구역과 이 광장은 안전하다. 길에서 좀비에게 붙잡히면 퀴즈가 나온다! 맞히면 그 사람이 정신을 되찾고, 틀리면 체력(❤)이 줄어. 체력이 다 떨어지면 기절해서 의금부로 끌려가고 엽전을 잃는다. 좀비가 보이면 Shift로 달려 도망쳐!');
   if (first) { showLines('도깨비', lines, function () { S.intro = true; save(); closeDlg(); toast('먼저 가까운 궁궐(위쪽)부터 가 볼까?'); }); return; }
   showChoices('도깨비', '무엇이 궁금하냐?', [{ label: '처음 설명 다시 듣기', fn: function () { showLines('도깨비', lines, closeDlg); } }, { label: '닫기', fn: closeDlg }]);
 }
@@ -1840,7 +1910,7 @@ function openMap() {
 function closeMap() { $('mapov').classList.add('hide'); setMode('play'); }
 function showEnding(wrong, zEnd) {
   var rank = S.wrongs <= 4 ? '영의정' : S.wrongs <= 10 ? '판서' : S.wrongs <= 20 ? '고을 수령' : '견습 서기';
-  $('ecard').innerHTML = '<div class="cert"><h2>🎉 임 명 장 🎉</h2><div class="big">' + S.name.replace(/[<>&]/g, '') + ' 을(를)<br>조선의 <span style="color:var(--accent)">' + rank + '</span>에 임명하노라</div><p>학습지 도장 ' + stampCount() + '/' + TOTAL + ' · 엽전 ' + S.coins + '냥 · 틀린 횟수 ' + S.wrongs + '번' + (zEnd ? ' · 구한 사람 ' + S.cured + '명' : '') + '</p>' + (zEnd ? '<p style="font-weight:900;color:var(--accent)">그대 덕분에 조선이 좀비의 위험에서 벗어났도다!</p>' : '') + '<p>중앙 정치 · 지방 행정 · 군사/교통/통신 · 관리 등용/교육<br>조선의 통치 체제를 모두 익혔다!</p></div><div class="crow"><button class="cbtn" id="eJ" style="background:#3b6fa8">학습지 보기</button><button class="cbtn" id="eC">계속 탐험하기</button></div>';
+  $('ecard').innerHTML = '<div class="cert"><h2>🎉 임 명 장 🎉</h2><div class="big">' + S.name.replace(/[<>&]/g, '') + ' 을(를)<br>조선의 <span style="color:var(--accent)">' + rank + '</span>에 임명하노라</div><p>학습지 도장 ' + stampCount() + '/' + TOTAL + ' · 엽전 ' + S.coins + '냥 · 틀린 횟수 ' + S.wrongs + '번' + (zEnd ? ' · 구한 사람 ' + S.cured + '명' : '') + (S.jailed ? ' · 의금부 ' + S.jailed + '번' : '') + '</p>' + (zEnd ? '<p style="font-weight:900;color:var(--accent)">그대 덕분에 조선이 좀비의 위험에서 벗어났도다!</p>' : '') + '<p>중앙 정치 · 지방 행정 · 군사/교통/통신 · 관리 등용/교육<br>조선의 통치 체제를 모두 익혔다!</p></div><div class="crow"><button class="cbtn" id="eJ" style="background:#3b6fa8">학습지 보기</button><button class="cbtn" id="eC">계속 탐험하기</button></div>';
   $('ending').classList.remove('hide'); setMode('ending'); sfx.fanBig();
   for (var i = 0; i < 36; i++) { (function (i) { var s = document.createElement('span'); s.className = 'conf'; s.textContent = ['🎉', '🪙', '📜', '✨'][i % 4]; s.style.left = Math.random() * 100 + 'vw'; s.style.animationDuration = (2.5 + Math.random() * 2.5) + 's'; s.style.animationDelay = Math.random() * 1.2 + 's'; document.body.appendChild(s); setTimeout(function () { s.remove(); }, 7000); })(i); }
   $('eC').onclick = function () { $('ending').classList.add('hide'); setMode('play'); hud(); if (zEnd) toast('🌅 날이 밝았다! 조선에 다시 평화가 찾아왔다.'); };
@@ -1918,6 +1988,8 @@ function begin(isNew) {
   $('title').classList.add('hide'); $('hud').classList.remove('hide'); $('keyhint').classList.remove('hide');
   setTimeout(function () { $('keyhint').style.opacity = 0; }, 14000);
   if (S.x && S.y && !isNew) { P.x = S.x; P.y = S.y; if (!canStand(P.x, P.y)) { P.x = 31.5 * T; P.y = 20.5 * T; } } else { P.x = 31.5 * T; P.y = 20.5 * T; }
+  if (!S.jailInit) { S.jailNext = Math.max(10, (Math.floor((S.wrongs || 0) / 10) + 1) * 10); S.jailInit = true; }
+  jailing = false; jailT = 0;
   S.zoff = !$('zIn').checked; ZOMB = []; zRespawn = []; ZFX = []; invul = 3; if (!(S.hp > 0)) S.hp = 3;
   syncGate(); syncShip(); hud(); setMode('play'); curZone = -2; ac();
   if (!S.intro) goblin(true);
